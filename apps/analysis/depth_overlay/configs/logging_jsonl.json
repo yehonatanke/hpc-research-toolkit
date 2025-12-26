@@ -1,0 +1,39 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "json": {
+            "()": "research_utils.logging.handlers.JSONFormatter",
+            "fmt_keys": {
+                "level": "levelname",
+                "logger": "name",
+                "line": "lineno"
+            }
+        }
+    },
+    "filters": {
+        "non_error": {
+            "()": "research_utils.logging.handlers.NonErrorFilter"
+        }
+    },
+    "handlers": {
+        "stdout": {
+            "class": "logging.StreamHandler",
+            "level": "ERROR",
+            "formatter": "json",
+            "stream": "ext://sys.stdout"
+        },
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "INFO",
+            "formatter": "json",
+            "filename": "logs/def_log.jsonl",
+            "maxBytes": 10485760,
+            "backupCount": 5
+        }
+    },
+    "root": {
+        "level": "DEBUG",
+        "handlers": ["stdout", "file"]
+    }
+}
