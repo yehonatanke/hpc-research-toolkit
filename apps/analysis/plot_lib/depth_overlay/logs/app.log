@@ -987,3 +987,66 @@ START NEW RUN: 2025-12-26 16:06:22
 ------------------------------------------------------------
 
 16:06:22 | INFO    | [get_depth_map() @ overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00001.npy
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 16:55:35
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 16:55:51
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 16:56:21
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 16:56:51
+------------------------------------------------------------
+
+16:56:51 | INFO    | [get_depth_map() @ research_utils/viz/overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00300.npy
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 17:18:28
+------------------------------------------------------------
+
+17:18:28 | INFO    | [get_depth_map() @ research_utils/viz/overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00100.npy
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 17:22:52
+------------------------------------------------------------
+
+17:22:52 | INFO    | [get_depth_map() @ research_utils/viz/overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00100.npy
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 17:24:44
+------------------------------------------------------------
+
+17:24:44 | INFO    | [get_depth_map() @ research_utils/viz/overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00100.npy
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 17:27:09
+------------------------------------------------------------
+
+17:27:09 | INFO    | [get_depth_map() @ research_utils/viz/overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00100.npy
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 17:29:01
+------------------------------------------------------------
+
+17:29:01 | INFO    | [get_depth_map() @ research_utils/viz/overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00100.npy
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 17:32:53
+------------------------------------------------------------
+
+17:32:53 | INFO    | [get_depth_map() @ research_utils/viz/overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00200.npy
+
+------------------------------------------------------------
+START NEW RUN: 2025-12-26 17:37:10
+------------------------------------------------------------
+
+17:37:10 | INFO    | [get_depth_map() @ research_utils/viz/overlay.py:22] Depth file is a numpy array /leonardo_work/AIFAC_S02_060/data/yk/debug/output/da3/dense/align_to_scale_conf_40/dense/depth/frame_00150.npy

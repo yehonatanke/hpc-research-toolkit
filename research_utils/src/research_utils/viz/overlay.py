@@ -1,10 +1,35 @@
 import os
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt  
+import matplotlib.pyplot as plt
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+def get_rgb_image(rgb_path: str):
+    img = cv2.imread(rgb_path)
+    if img is None:
+        logger.error("RGB file not found", extra={"path": rgb_path})
+        raise FileNotFoundError(f"Error reading RGB: {rgb_path}")
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    return img
+
+
+def get_depth_map(depth_path: str):
+    if depth_path.endswith(".npy"):
+        depth_map = np.load(depth_path)
+        logger.info("Depth file is a numpy array", extra={"path": depth_path})
+    else:
+        depth_map = cv2.imread(depth_path, cv2.IMREAD_UNCHANGED)
+        logger.info("Depth file is not a numpy array", extra={"path": depth_path})
+
+    if depth_map is None:
+        logger.error("Depth file not found", extra={"path": depth_path})
+        raise FileNotFoundError(f"Error reading Depth: {depth_path}")
+
+    return depth_map
 
 
 def get_save_path(rgb_path, save_dir):
@@ -13,23 +38,18 @@ def get_save_path(rgb_path, save_dir):
     abs_path = os.path.abspath(save_dir)
     full_path = os.path.join(abs_path, filename)
 
-    logger.info("Generating save path", extra={"full_path": full_path, "abs_path": abs_path, "file_name": filename})
+    logger.debug("Generating save path:")
+    logger.debug("full_path", extra={"path": full_path})
+    logger.debug("abs_path", extra={"path": abs_path})
+    logger.debug("file_name", extra={"path": filename})
 
     os.makedirs(os.path.dirname(full_path), exist_ok=True)
     return full_path
 
 
-def plot_overlay(rgb_path, depth_path, save_dir, alpha=0.6):
-    rgb_img = cv2.imread(rgb_path)
-    if rgb_img is None:
-        logger.error("RGB file not found", extra={"path": rgb_path})
-        raise FileNotFoundError(f"Error reading RGB: {rgb_path}")
-    rgb_img = cv2.cvtColor(rgb_img, cv2.COLOR_BGR2RGB)
-
-    depth_map = cv2.imread(depth_path, cv2.IMREAD_UNCHANGED)
-    if depth_map is None:
-        logger.error("Depth file not found", extra={"path": depth_path})
-        raise FileNotFoundError(f"Error reading Depth: {depth_path}")
+def plot_overlay(rgb_path, depth_path, save_dir, model_name, alpha=0.6):
+    rgb_img = get_rgb_image(rgb_path)
+    depth_map = get_depth_map(depth_path)
 
     if len(depth_map.shape) > 2:
         depth_map = depth_map[:, :, 0]
@@ -55,16 +75,30 @@ def plot_overlay(rgb_path, depth_path, save_dir, alpha=0.6):
     images = [rgb_img, depth_colored, overlay]
     titles = ["RGB", "Depth", f"Overlay ({alpha})"]
 
+    if model_name:
+        plt.gcf().text(
+            0.02,
+            0.96,
+            f"Model: {model_name}",
+            fontsize=10,
+            color="blue",
+            horizontalalignment="left",
+            verticalalignment="top",
+            bbox=dict(facecolor="white", alpha=0.5, edgecolor="none", boxstyle="round"),
+        )
+
     for i, (img, title) in enumerate(zip(images, titles), 1):
         plt.subplot(1, 3, i)
         plt.imshow(img)
-        plt.title(title)
+        plt.title(title, fontsize=10, color="black")
         plt.axis("off")
+        plt.tight_layout()
 
     plt.tight_layout()
     out_file = get_save_path(rgb_path, save_dir)
+    logger.debug("Saving figure to", extra={"path": out_file})
 
-    logger.info(f"Saving figure to {out_file}")
     plt.savefig(out_file)
     plt.close()
+
     return out_file

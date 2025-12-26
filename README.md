@@ -75,7 +75,7 @@ Application-specific modules that depend on `research_utils`. Each application i
     - See: [WAI-Viser](https://github.com/yehonatanke/WAI-Viser)
 
 
-### `scripts/`
+#### `scripts/`
 
 Top-level scripts directory containing automated HPC workflows and utility tools:
 
@@ -334,7 +334,7 @@ cd apps/rendering/viser/wai-vis
 pip install -e .
 ```
 
-**Note**: All applications depend on `research-utils`, so ensure it is installed first before installing any app.
+**Note**: All applications depend on `research-utils`.
 
 ### Running Applications
 
