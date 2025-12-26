@@ -1,0 +1,346 @@
+# Research Codebase
+
+This repository contains research code for computer vision, 3D visualization, and analysis workflows designed to run on High-Performance Computing (HPC) systems.
+
+## Overview
+
+This codebase is structured as a modular research toolkit with shared utilities and application-specific modules. It is designed to work within HPC environments where computational resources are managed through job schedulers and distributed computing systems.
+
+## Repository Structure
+
+```
+code/
+├── research_utils/          # Shared utilities package
+│   ├── src/research_utils/
+│   │   ├── core/            # Core utilities (I/O, logging)
+│   │   ├── logging/         # Advanced logging handlers and color picker
+│   │   ├── ops/             # Operations (geometry utilities)
+│   │   └── viz/             # Visualization utilities
+│   └── pyproject.toml       # Package configuration
+│
+├── apps/                     # Application-specific code
+│   ├── analysis/            # Analysis and plotting tools
+│   │   └── plot_lib/
+│   │       ├── depth_overlay/          # Depth overlay visualization
+│   │       └── depth_overlay_compare/   # Depth overlay comparison tool
+│   │
+│   └── rendering/           # 3D rendering applications
+│       └── viser/
+│           ├── dl3dv/       # Scene rendering scripts
+│           └── wai-vis/     # Visualization application
+│
+└── scripts/                  # HPC workflow and utility scripts
+    ├── python/              # Standalone Python utility scripts
+    ├── slurm/               # SLURM job submission scripts
+    └── archive/             # Archived/legacy scripts
+```
+
+## Components
+
+### `research_utils/`
+
+A shared Python package providing common utilities for research workflows:
+
+- **Core**: I/O operations and logging infrastructure
+- **Logging**: Advanced logging handlers with color support and JSON logging
+- **Operations**: Geometry and mathematical operations
+- **Visualization**: Overlay and plotting utilities
+
+**Installation:**
+```bash
+cd research_utils
+pip install -e .
+```
+
+### `apps/`
+
+Application-specific modules that depend on `research_utils`:
+
+#### Analysis Tools
+
+- **`depth_overlay/`**: Creates depth overlay visualizations from RGB and depth images
+- **`depth_overlay_compare/`**: Compares multiple depth overlay visualizations
+
+#### Rendering Tools
+
+- **`dl3dv/`**: Scene rendering scripts for 3D visualization
+- **`wai-vis/`**: Interactive visualization application with modules for dataset handling, geometry processing, and rendering
+
+### `scripts/`
+
+Top-level scripts directory containing HPC workflow scripts and utility tools:
+
+#### `python/`
+
+Standalone Python utility scripts for common tasks:
+- **`plot_depth_overlay.py`**: Quick depth overlay visualization
+- **`plot_exr.py`**: EXR file visualization utilities
+- **`check_statistics_by_folder.py`**: Statistical analysis of datasets
+- **`change_resolution.py`**: Image resolution conversion utilities
+
+#### `slurm/`
+
+SLURM job submission scripts for HPC workflows. These scripts handle:
+- **Multi-view stereo (MVSA)**: Depth estimation and processing (`run_mvsa.sh`, `depth_consistency_confidence_mvsa.sh`)
+- **Visualization**: Data visualization jobs (`viz_data.sh`, `viz_data_folder.sh`, `viz_data_folder_interactive_3D.sh`)
+- **Data processing**: Consistency checks, covisibility analysis, undistortion (`consistency.sh`, `covisibility.sh`, `undistortion.sh`)
+- **Model execution**: Running specialized models like Depth Anything 3 (`da3/` subdirectory)
+- **Resource management**: GPU allocation, memory requirements, partition selection
+
+Each SLURM script includes:
+- Resource specifications (CPU, GPU, memory, time limits)
+- Environment setup (virtual environments, module loading)
+- Logging configuration (job output/error files)
+- Error handling and status reporting
+
+#### `archive/`
+
+Legacy and archived scripts maintained for reference or historical purposes.
+
+## Modularity
+
+This codebase follows a **modular architecture** that promotes code reuse and maintainability:
+
+### Shared Utilities Package (`research_utils`)
+
+The `research_utils` package serves as a centralized library of reusable components that all applications can import and use. This design pattern provides several benefits:
+
+- **Code Reuse**: Common functionality (logging, I/O, visualization) is implemented once and shared across all applications
+- **Consistency**: All applications use the same logging system, configuration loading, and utility functions
+- **Maintainability**: Bug fixes and improvements to shared utilities benefit all applications automatically
+- **Separation of Concerns**: Application-specific logic is isolated from general-purpose utilities
+
+**Example Usage:**
+```python
+from research_utils import plot_overlay, print_args, setup_logging, load_config
+
+# All apps can use these shared utilities
+setup_logging("configs/default_logging.json")
+config = load_config("configs/default.json")
+plot_overlay(rgb_path="...", depth_path="...", save_dir="...")
+```
+
+### Application Modules (`apps/`)
+
+Each application in the `apps/` directory is:
+- **Self-contained**: Has its own configuration files, scripts, and output directories
+- **Independent**: Can be run separately without affecting other applications
+- **Configurable**: Uses JSON configuration files for easy customization
+- **CLI-based**: Provides command-line interfaces for HPC job submission
+
+### Module Structure Pattern
+
+Each application typically follows this structure:
+```
+app_name/
+├── configs/          # JSON configuration files
+│   ├── default.json           # Application config
+│   └── default_logging.json   # Logging config
+├── scripts/          # Executable scripts
+├── src/              # Application source code
+├── logs/             # Generated log files
+└── output/           # Generated outputs
+```
+
+## Usage Patterns
+
+### Configuration-Driven Execution
+
+Applications are designed to be **configuration-driven**, making them ideal for HPC workflows where parameters may vary between job runs:
+
+1. **Default Configurations**: Each app includes default JSON configs in `configs/`
+2. **Custom Configurations**: Override defaults via command-line arguments
+3. **Auto-Discovery**: The `load_config()` utility automatically searches for config files relative to the calling script
+
+**Example:**
+```bash
+# Use default config
+python -m scripts.run_depth_overlay --rgb_path /path/to/rgb.jpg --depth_path /path/to/depth.exr
+
+# Use custom config
+python -m scripts.run_depth_overlay \
+    --config_path configs/custom.json \
+    --log_config configs/logging_verbos.json \
+    --rgb_path /path/to/rgb.jpg \
+    --depth_path /path/to/depth.exr
+```
+
+### Command-Line Interface Pattern
+
+All applications follow a consistent CLI pattern:
+- **Required arguments**: Essential inputs (e.g., file paths)
+- **Optional arguments**: Configurable parameters with sensible defaults
+- **Config integration**: Arguments can override or complement JSON configs
+- **Logging setup**: Logging is initialized early via `--log_config` argument
+
+### HPC Job Submission
+
+Applications are designed to be submitted as HPC jobs. The repository provides two approaches:
+
+#### Using Application Scripts
+
+Applications can be submitted directly:
+
+```bash
+# Example SLURM job script
+#!/bin/bash
+#SBATCH --job-name=depth_overlay
+#SBATCH --output=logs/job_%j.out
+#SBATCH --error=logs/job_%j.err
+
+source .venvs/myenv/bin/activate
+cd apps/analysis/plot_lib/depth_overlay
+python -m scripts.run_depth_overlay \
+    --rgb_path $RGB_PATH \
+    --depth_path $DEPTH_PATH \
+    --export-dir output/
+```
+
+#### Using Top-Level SLURM Scripts
+
+Pre-configured SLURM scripts in `scripts/slurm/` provide ready-to-use job templates:
+
+```bash
+# Submit a pre-configured job
+sbatch scripts/slurm/run_mvsa.sh
+
+# Or modify and submit
+sbatch scripts/slurm/viz_data.sh
+```
+
+These scripts include:
+- Resource allocation (CPU, GPU, memory)
+- Environment setup (CUDA modules, virtual environments)
+- Path configuration for datasets and outputs
+- Comprehensive logging and error handling
+
+## Logging System
+
+The codebase includes a **sophisticated, multi-formatter logging system** designed for both interactive development and HPC batch processing:
+
+### Features
+
+1. **Multiple Formatters**:
+   - **JSON Formatter**: Structured logging for programmatic analysis and HPC job monitoring
+   - **Color Formatters**: Human-readable console output with syntax highlighting
+   - **Readable Formatters**: Plain text formats for log files
+
+2. **Structured Logging**: Support for custom `extra` fields that are automatically captured:
+   ```python
+   logger.info("Processing file", extra={"path": "/data/file.csv", "request_id": "abc123"})
+   ```
+
+3. **Configurable via JSON**: Logging behavior is configured through JSON files, allowing different log levels and handlers per application
+
+4. **Multiple Handlers**: Simultaneous output to:
+   - **Console (stdout)**: Colored, human-readable output for interactive use
+   - **File**: Persistent logs with rotation support
+   - **JSONL files**: Structured logs for post-processing
+
+### Logging Configuration
+
+Logging is configured via JSON files (e.g., `configs/default_logging.json`):
+
+```json
+{
+    "version": 1,
+    "formatters": {
+        "json": {
+            "()": "research_utils.logging.handlers.JSONFormatter"
+        },
+        "readable_color_stdout": {
+            "()": "research_utils.logging.handlers.ReadableColorFormatter"
+        }
+    },
+    "handlers": {
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "formatter": "readable",
+            "filename": "logs/app.log"
+        },
+        "stdout": {
+            "class": "logging.StreamHandler",
+            "formatter": "readable_color_stdout",
+            "level": "DEBUG"
+        }
+    }
+}
+```
+
+### Usage in Applications
+
+Applications initialize logging early in their execution:
+
+```python
+from research_utils import setup_logging
+import logging
+
+# Setup logging from config file
+setup_logging("configs/default_logging.json")
+logger = logging.getLogger(__name__)
+
+# Use structured logging
+logger.info("Processing started", extra={"input_args": vars(args)})
+logger.error("File not found", extra={"path": file_path})
+```
+
+### Benefits for HPC Workflows
+
+- **Post-Processing**: JSON logs can be parsed and analyzed after job completion
+- **Debugging**: Detailed logs with function names, line numbers, and timestamps
+- **Monitoring**: Structured logs enable automated job monitoring and error detection
+- **Reproducibility**: Log configurations are version-controlled alongside code
+
+## HPC Workflow Integration
+
+This codebase is designed to integrate with HPC job schedulers (e.g., SLURM, PBS). When running on HPC systems:
+
+1. **Environment Setup**: Use virtual environments (`.venvs/` directory) to manage dependencies per job or workflow
+2. **Resource Management**: Configure job scripts to request appropriate compute resources (CPU, GPU, memory)
+3. **Data I/O**: Ensure data paths are accessible from compute nodes (shared filesystems, network storage)
+4. **Logging**: Structured logging outputs (JSON, JSONL) are designed for post-processing and analysis of HPC job outputs
+
+## Dependencies
+
+### Core Dependencies (research_utils)
+- `numpy`
+- `opencv-python`
+- `matplotlib`
+
+### Application Dependencies
+See individual `pyproject.toml` and `requirements.txt` files in each application directory for specific dependencies.
+
+## Usage
+
+### Setting Up the Environment
+
+1. Install the shared utilities package:
+```bash
+cd research_utils
+pip install -e .
+```
+
+2. Install application-specific dependencies as needed.
+
+### Running Applications
+
+Each application typically includes:
+- Configuration files in `configs/`
+- Scripts in `scripts/`
+- Output directories for results
+- Logging directories for job outputs
+
+Refer to individual application directories for specific usage instructions.
+
+## Development
+
+- Python 3.8+ required
+- Virtual environments recommended (see `.venvs/` directory)
+- Follow the existing structure when adding new applications or utilities
+
+## Notes
+
+- This repository is part of a larger HPC workflow system
+- Logs and outputs are typically generated during HPC job execution
+- Configuration files use JSON format for easy modification and version control
+
