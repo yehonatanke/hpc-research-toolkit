@@ -13,37 +13,55 @@ Modular research codebase optimized for HPC environments. Combines reusable shar
 code/
 ├── research_utils/          # Shared utilities package
 │   ├── src/research_utils/
-│   │   ├── core/            # Core utilities (I/O, logging)
-│   │   ├── logging/         # Advanced logging handlers and color picker
-│   │   ├── ops/             # Operations (geometry utilities)
-│   │   └── viz/             # Visualization utilities
+│   │   ├── core/           
+│   │   ├── io/             
+│   │   ├── logging/         
+│   │   ├── ops/             
+│   │   └── viz/             
 │   └── pyproject.toml       
 │
 ├── apps/                     # Application-specific code
-│   ├── analysis/             # Analysis and plotting tools
-│   │   └── plot_lib/
-│   │       ├── depth_overlay/           # Depth overlay visualization
-│   │       │   └── pyproject.toml
-│   │       └── depth_overlay_compare/   # Depth overlay comparison tool
-│   │           └── pyproject.toml
+│   ├── analysis/             
+│   │   ├── depth_overlay/           
+│   │   │   ├── src/                 
+│   │   │   ├── scripts/              
+│   │   │   ├── configs/               
+│   │   │   ├── output/                
+│   │   │   ├── logs/                  
+│   │   │   └── pyproject.toml
+│   │   └── depth_overlay_compare/   
+│   │       ├── src/                 
+│   │       ├── scripts/              
+│   │       ├── configs/
+│   │       ├── output/            
+│   │       ├── logs/                
+│   │       └── pyproject.toml
 │   │
-│   └── rendering/           # 3D rendering applications
+│   └── rendering/           
 │       └── viser/
-│           ├── dl3dv/       # Scene rendering scripts
+│           ├── dl3dv/       
+│           │   ├── drafts/            
+│           │   ├── logs/              
+│           │   ├── render_scene.py
+│           │   ├── render_scene_v2.py
 │           │   └── pyproject.toml
-│           └── wai-vis/     # Visualization application
-│               └── pyproject.toml
+│           └── wai-vis/     # 3D rendering
+│               ├── modules/           
+│               ├── main.py
+│               ├── pyproject.toml
+│               └── requirements.txt
 │
-└── scripts/                 # HPC workflow and utility 
-    ├── python/              # Python utility scripts
-    ├── slurm/               # SLURM job submission scripts
-    └── archive/            
+└── scripts/                 # HPC workflow and utility scripts
+    ├── python/              
+    ├── slurm/              
+    │   └── da3/            
+    └── archive/             
 ```
 </details>
 
 ## Components
 
-### `research_utils/`
+#### `research_utils/`
 
 Reusable Python package with core utilities for research workflows:
 
@@ -58,7 +76,7 @@ cd research_utils
 pip install -e .
 ```
 
-### `apps/`
+#### `apps/`
 
 Application-specific modules that depend on `research_utils`. Each application includes a `pyproject.toml` file for dependency management and can be installed in editable mode:
 
@@ -118,26 +136,9 @@ Each application in the `apps/` directory is:
 - **Configurable**: Uses JSON configuration files for easy customization
 - **CLI-based**: Provides command-line interfaces for HPC job submission
 
-### Module Structure Pattern
-
-Each application typically follows this structure:
-```
-app_name/
-├── configs/          # JSON configuration files
-│   ├── default.json           # Application config
-│   └── default_logging.json   # Logging config
-├── scripts/          # Executable scripts
-├── src/              # Application source code
-├── pyproject.toml    # Python package configuration and dependencies
-├── logs/             # Generated log files
-└── output/           # Generated outputs
-```
-
-Each application includes a `pyproject.toml` file for dependency management and editable installation, following modern Python packaging standards (PEP 621).
-
 ## Usage Patterns
 
-### Configuration-Driven Execution
+#### Configuration-Driven Execution
 
 Applications are designed to be **configuration-driven**, making them ideal for HPC workflows where parameters may vary between job runs:
 
@@ -158,7 +159,7 @@ python -m scripts.run_depth_overlay \
     --depth_path /path/to/depth.exr
 ```
 
-### Command-Line Interface Pattern
+#### Command-Line Interface Pattern
 
 All applications follow a consistent CLI pattern:
 - **Required arguments**: Essential inputs (e.g., file paths)
@@ -166,52 +167,15 @@ All applications follow a consistent CLI pattern:
 - **Config integration**: Arguments can override or complement JSON configs
 - **Logging setup**: Logging is initialized early via `--log_config` argument
 
-### HPC Job Submission
+#### HPC Job Submission
 
-Applications are designed to be submitted as HPC jobs. The repository provides two approaches:
-
-#### Using Application Scripts
-
-Applications can be submitted directly:
-
-```bash
-# Example SLURM job script
-#!/bin/bash
-#SBATCH --job-name=depth_overlay
-#SBATCH --output=logs/job_%j.out
-#SBATCH --error=logs/job_%j.err
-
-source .venvs/myenv/bin/activate
-cd apps/analysis/plot_lib/depth_overlay
-python -m scripts.run_depth_overlay \
-    --rgb_path $RGB_PATH \
-    --depth_path $DEPTH_PATH \
-    --export-dir output/
-```
-
-#### Using Top-Level SLURM Scripts
-
-Pre-configured SLURM scripts in `scripts/slurm/` provide ready-to-use job templates:
-
-```bash
-# Submit a pre-configured job
-sbatch scripts/slurm/run_mvsa.sh
-
-# Or modify and submit
-sbatch scripts/slurm/viz_data.sh
-```
-
-These scripts include:
-- Resource allocation (CPU, GPU, memory)
-- Environment setup (CUDA modules, virtual environments)
-- Path configuration for datasets and outputs
-- Comprehensive logging and error handling
+Applications are designed to be submitted directly or as HPC jobs. 
 
 ## Logging System
 
 Multi-formatter system optimized for interactive and batch use:
 
-### Features
+#### Features
 
 1. **Multiple Formatters**:
    - **JSON Formatter**: Structured logging for programmatic analysis and HPC job monitoring
@@ -230,7 +194,7 @@ Multi-formatter system optimized for interactive and batch use:
    - **File**: Persistent logs with rotation support
    - **JSONL files**: Structured logs for post-processing
 
-### Logging Configuration
+#### Logging Configuration
 
 Logging is configured via JSON files (e.g., `configs/default_logging.json`):
 
@@ -260,7 +224,7 @@ Logging is configured via JSON files (e.g., `configs/default_logging.json`):
 }
 ```
 
-### Usage in Applications
+#### Usage in Applications
 
 Applications initialize logging early in their execution:
 
@@ -268,16 +232,16 @@ Applications initialize logging early in their execution:
 from research_utils import setup_logging
 import logging
 
-# Setup logging from config file
+# setup logging from config file
 setup_logging("configs/default_logging.json")
 logger = logging.getLogger(__name__)
 
-# Use structured logging
+# use structured logging
 logger.info("Processing started", extra={"input_args": vars(args)})
 logger.error("File not found", extra={"path": file_path})
 ```
 
-### Benefits for HPC Workflows
+#### Benefits for HPC Workflows
 
 - **Post-Processing**: JSON logs can be parsed and analyzed after job completion
 - **Debugging**: Detailed logs with function names, line numbers, and timestamps
@@ -304,12 +268,7 @@ This codebase is designed to integrate with HPC job schedulers (e.g., SLURM, PBS
 
 #### Application Dependencies
 
-Each application manages its own dependencies via `pyproject.toml`:
-
-- **`depth_overlay/`**: `research-utils`, `opencv-python`
-- **`depth_overlay_compare/`**: `research-utils`, `opencv-python`, `numpy`, `matplotlib`, `tqdm`
-- **`dl3dv/`**: `viser`, `numpy`, `opencv-python`, `imageio`
-- **`wai-vis/`**: `viser`, `numpy`, `opencv-python`, `pillow`
+See individual `pyproject.toml` and `requirements.txt` files in each application directory for specific dependencies.
 
 All applications depend on `research-utils`, which must be installed first.
 
@@ -326,15 +285,13 @@ pip install -e .
 2. Install application-specific dependencies. Each app can be installed in editable mode using its `pyproject.toml`:
 ```bash
 # Install a specific application
-cd apps/analysis/plot_lib/depth_overlay
+cd apps/analysis/depth_overlay
 pip install -e .
 
 # Or install multiple apps
 cd apps/rendering/viser/wai-vis
 pip install -e .
 ```
-
-**Note**: All applications depend on `research-utils`.
 
 ### Running Applications
 
