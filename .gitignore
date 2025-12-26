@@ -41,7 +41,5 @@ dmypy.json
 .pytype/
 cython_debug/
 .venvs/
-logs/*
-*.log
 node_modules/
 data/*

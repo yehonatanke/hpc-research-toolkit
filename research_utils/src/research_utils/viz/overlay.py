@@ -20,10 +20,10 @@ def get_rgb_image(rgb_path: str):
 def get_depth_map(depth_path: str):
     if depth_path.endswith(".npy"):
         depth_map = np.load(depth_path)
-        logger.info("Depth file is a numpy array", extra={"path": depth_path})
+        logger.debug("Depth file is a numpy array", extra={"path": depth_path})
     else:
         depth_map = cv2.imread(depth_path, cv2.IMREAD_UNCHANGED)
-        logger.info("Depth file is not a numpy array", extra={"path": depth_path})
+        logger.debug("Depth file is not a numpy array", extra={"path": depth_path})
 
     if depth_map is None:
         logger.error("Depth file not found", extra={"path": depth_path})
@@ -96,7 +96,7 @@ def plot_overlay(rgb_path, depth_path, save_dir, model_name, alpha=0.6):
 
     plt.tight_layout()
     out_file = get_save_path(rgb_path, save_dir)
-    logger.debug("Saving figure to", extra={"path": out_file})
+    logger.info("Figure saved to:", extra={"path": out_file})
 
     plt.savefig(out_file)
     plt.close()
