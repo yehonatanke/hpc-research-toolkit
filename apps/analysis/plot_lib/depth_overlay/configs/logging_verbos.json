@@ -2,39 +2,54 @@
     "version": 1,
     "disable_existing_loggers": false,
     "formatters": {
-        "readable": {
-            "format": "%(asctime)s | %(levelname)-7s | %(name)s:%(funcName)s:%(lineno)d - %(message)s",
-            "datefmt": "%d-%m-%Y %H:%M:%S"
+        "readable_file": {
+            "()": "research_utils.logging.handlers.ReadableColorFormatterFile"
         },
-        "json {
-            "()": "research_utils.logging.handlers.JSONFormatter",
-            "fmt_keys": {
-                "level": "levelname",
-                "logger": "name",
-                "line": "lineno"
-            }
-        },
-        "colored": {
-            "()": "research_utils.logging.handlers.ColoredFormatter"
-    }
+        "readable_color_console": {
+            "()": "research_utils.logging.handlers.ReadableColorFormatterConsole"
+        }
     },
     "handlers": {
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "level": "INFO",
-            "formatter": "readable",
+            "level": "DEBUG",
+            "formatter": "readable_file",
             "filename": "logs/app.log",
-            "maxBytes": 10485760,
-            "backupCount": 5
+            "maxBytes": 52428800,
+            "backupCount": 10,
+            "encoding": "utf8",
+            "delay": true
         },
         "stdout": {
             "class": "logging.StreamHandler",
-            "formatter": "colored",
-            "stream": "ext://sys.stdout"            
+            "formatter": "readable_color_console",
+            "level": "DEBUG",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "urllib3": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout",
+                "file"
+            ],
+            "propagate": false
+        },
+        "asyncio": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout",
+                "file"
+            ],
+            "propagate": false
         }
     },
     "root": {
         "level": "DEBUG",
-        "handlers": ["stdout", "file"]
+        "handlers": [
+            "stdout",
+            "file"
+        ]
     }
 }

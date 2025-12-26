@@ -22,11 +22,11 @@ def parse_args():
     config_path = args.config_path if args.config_path else DEFAULT_CONFIG
     config = load_config(config_path=config_path)
 
-    logger.info(f"Config path: {os.path.abspath(config_path)}")
+    logger.debug(f"Config path: {os.path.abspath(config_path)}")
     if args.config_path:
-        logger.info(f"Custom config path: {os.path.abspath(args.config_path)}")
+        logger.debug("Custom config path:", extra={"path": os.path.abspath(args.config_path)})
     else:
-        logger.info(f"Default Config path: {os.path.abspath(DEFAULT_CONFIG)}")
+        logger.debug("Default Config path:", extra={"path": os.path.abspath(DEFAULT_CONFIG)})
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--rgb_path", type=str, required=True)
@@ -34,70 +34,13 @@ def parse_args():
     parser.add_argument("--export-dir", type=str, default=config.get("export_dir"))
     parser.add_argument("--dense_dataset", action="store_true")
     parser.add_argument("--alpha", type=float, default=config.get("alpha", 0.6))
+    parser.add_argument("--model_name", type=str)
     parser.add_argument("--log_path", type=str, default=config.get("log_path"))
     parser.add_argument("--config_path", type=str, default=config_path)
 
-    # Debug info (only print if log_path exists)
     log_path = config.get("log_path")
     if log_path:
-        logger.debug(f"Log path from config: {log_path}")
-        logger.debug(f"Absolute log path: {os.path.abspath(log_path)}")
-    runloger()
+        logger.debug("Log path from config:", extra={"path": log_path})
+        logger.debug("Absolute log path:", extra={"path": os.path.abspath(log_path)})
+
     return parser.parse_args()
-
-def runloger():
-    logger = logging.getLogger(__name__)
-
-    logger.debug("Debug message", extra={"request_id": "abc123"})
-    logger.info("Application started")
-    logger.warning("Something suspicious")
-    logger.error("Failed to connect", exc_info=True)
-    # Option 1: Use % formatting (recommended for single path)
-    logger.info("Loading model from: %s", "./models/best.pth")
-
-    # Option 2: Use .extra={} for structured extras
-    logger.info("Loading model from:", extra={"path": "./models/best.pth"})
-
-    # Option 3: Multiple extras
-    logger.info("Processing file:", extra={"path": "/data/train.csv", "request_id": "abc123"})
-    exit()
-# def parse_args():
-#     # Preliminary parse to check for a custom config path
-#     conf_parser = argparse.ArgumentParser(add_help=False)
-#     conf_parser.add_argument("--config_path", type=str)
-#     args, _ = conf_parser.parse_known_args()
-
-#     # Load specified or default configuration
-#     config_path = args.config_path if args.config_path else "default.json"
-#     print(f"Config path: {config_path}")
-#     if args.config_path:
-#         print(f"custom config path: {os.path.abspath(args.config_path)}")
-#     else:
-#         print(f"default Config path: {os.path.abspath('configs/default.json')}")
-#     config = load_config(config_filename=config_path)
-
-#     # Main parser with dynamic defaults from the loaded config
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("--rgb_path", type=str, required=True)
-#     parser.add_argument("--depth_path", type=str, required=True)
-#     parser.add_argument("--export-dir", type=str, default=config.get("export_dir"))
-#     parser.add_argument("--dense_dataset", action="store_true")
-#     parser.add_argument("--alpha", type=float, default=config.get("alpha", 0.6))
-#     parser.add_argument("--log_path", type=str, default=config.get("log_path"))
-#     parser.add_argument("--config_path", type=str, default=config_path)
-
-#     return parser.parse_args()
-
-# def parse_args():
-#     config_defaults = load_config(config_filename="default.json")
-
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("--rgb_path", type=str, required=True)
-#     parser.add_argument("--depth_path", type=str, required=True)
-#     parser.add_argument("--export-dir", type=str, default=config_defaults["export_dir"])
-#     parser.add_argument("--dense_dataset", action="store_true", help="Use dense dataset")
-#     parser.add_argument("--alpha", type=float, default=0.6)
-#     parser.add_argument("--log_path", type=str, default=config_defaults["log_path"])
-#     parser.add_argument("--config_path", type=str, default=config_defaults["config_path"])
-
-#     return parser.parse_args()
