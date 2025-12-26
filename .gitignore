@@ -43,3 +43,5 @@ cython_debug/
 .venvs/
 logs/*
 *.log
+node_modules/
+data/*

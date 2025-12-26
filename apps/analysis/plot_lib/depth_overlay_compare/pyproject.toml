@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "depth-overlay-compare"
+version = "0.1.0"
+description = "Depth overlay comparison tool"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "research-utils",  # Install from ../research_utils first
+    "opencv-python",
+    "numpy",
+    "matplotlib",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+dev = []
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

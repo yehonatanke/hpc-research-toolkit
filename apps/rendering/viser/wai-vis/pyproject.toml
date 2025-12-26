@@ -3,22 +3,24 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "depth-overlay"
+name = "wai-vis"
 version = "0.1.0"
-description = "Depth overlay visualization tool"
+description = "Interactive web-based 3D visualization tool for WAI/Nerfstudio datasets"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "research-utils",  # Install from ../research_utils first
+    "viser",
+    "numpy",
     "opencv-python",
+    "pillow",
 ]
 
 [project.optional-dependencies]
 dev = []
 
 [tool.setuptools]
-package-dir = {"" = "src"}
+package-dir = {"" = "."}
 
 [tool.setuptools.packages.find]
-where = ["src"]
+where = ["."]
 
