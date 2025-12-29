@@ -47,7 +47,12 @@ def get_save_path(rgb_path, save_dir):
     return full_path
 
 
-def plot_overlay(rgb_path, depth_path, save_dir, model_name, alpha=0.6):
+def plot_overlay(rgb_path, depth_path, save_dir, model_name, alpha=0.6, comment: str = ""):
+    if comment:
+        comment = f"\nComment: {comment}"
+    else:
+        comment = ""
+
     rgb_img = get_rgb_image(rgb_path)
     depth_map = get_depth_map(depth_path)
 
@@ -63,16 +68,18 @@ def plot_overlay(rgb_path, depth_path, save_dir, model_name, alpha=0.6):
     depth_colored = cv2.cvtColor(depth_colored, cv2.COLOR_BGR2RGB)
 
     logger.info(
-        "RGB and Depth Dimentions:", 
-        extra={"rgb_shape": rgb_img.shape[:2], "depth_shape": depth_colored.shape[:2]},
+        "RGB & Depth Dimentions:", 
+        extra={"RGB": rgb_img.shape[:2], "Depth": depth_colored.shape[:2]},
         )
     
     if rgb_img.shape[:2] != depth_colored.shape[:2]:
-        logger.warning(
-            "Dimension mismatch, resizing depth map",
-            extra={"rgb_shape": rgb_img.shape[:2], "depth_shape": depth_colored.shape[:2]},
-        )
+        rgb_orig = rgb_img.shape[:2]
+        depth_orig = depth_colored.shape[:2]
         depth_colored = cv2.resize(depth_colored, (rgb_img.shape[1], rgb_img.shape[0]))
+        logger.warning(
+            "Resizing depth to match RGB dimensions",
+            extra={f"RGB: {rgb_orig} --> {rgb_img.shape[:2]}", f"Depth: {depth_orig} --> {depth_colored.shape[:2]}"},
+        )
 
     overlay = cv2.addWeighted(rgb_img, 1 - alpha, depth_colored, alpha, 0)
 
@@ -84,12 +91,12 @@ def plot_overlay(rgb_path, depth_path, save_dir, model_name, alpha=0.6):
         plt.gcf().text(
             0.02,
             0.96,
-            f"Model: {model_name}",
+            f"Model: {model_name}{comment}",
             fontsize=10,
             color="blue",
             horizontalalignment="left",
             verticalalignment="top",
-            bbox=dict(facecolor="white", alpha=0.5, edgecolor="none", boxstyle="round"),
+            bbox=dict(facecolor="gainsboro", alpha=0.5, edgecolor="none", boxstyle="round"),
         )
 
     for i, (img, title) in enumerate(zip(images, titles), 1):

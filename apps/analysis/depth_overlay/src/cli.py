@@ -37,6 +37,7 @@ def parse_args():
     parser.add_argument("--model_name", type=str)
     parser.add_argument("--log_path", type=str, default=config.get("log_path"))
     parser.add_argument("--config_path", type=str, default=config_path)
+    parser.add_argument("--comment", type=str, default="")
 
     log_path = config.get("log_path")
     if log_path:
