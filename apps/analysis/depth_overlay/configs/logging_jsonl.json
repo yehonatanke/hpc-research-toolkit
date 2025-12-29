@@ -25,7 +25,6 @@
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "level": "INFO",
             "formatter": "json",
             "filename": "logs/def_log.jsonl",
             "maxBytes": 10485760,
