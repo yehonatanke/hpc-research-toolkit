@@ -62,6 +62,11 @@ def plot_overlay(rgb_path, depth_path, save_dir, model_name, alpha=0.6):
     depth_colored = cv2.applyColorMap(depth_uint8, cv2.COLORMAP_PLASMA)
     depth_colored = cv2.cvtColor(depth_colored, cv2.COLOR_BGR2RGB)
 
+    logger.info(
+        "RGB and Depth Dimentions:", 
+        extra={"rgb_shape": rgb_img.shape[:2], "depth_shape": depth_colored.shape[:2]},
+        )
+    
     if rgb_img.shape[:2] != depth_colored.shape[:2]:
         logger.warning(
             "Dimension mismatch, resizing depth map",

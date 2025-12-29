@@ -2,7 +2,7 @@ import os
 import logging
 
 from src.cli import parse_args
-from research_utils import plot_overlay, print_args
+from research_utils import plot_overlay, print_args, print_args_gray
 
 
 logger = logging.getLogger(__name__)
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def main():
     args = parse_args()
-    print_args(args)
+    print_args_gray(args)
     logger.debug("Script started with args", extra={"input_args": vars(args)})
 
     plot_overlay(rgb_path=args.rgb_path, depth_path=args.depth_path, save_dir=args.export_dir, model_name=args.model_name, alpha=args.alpha)

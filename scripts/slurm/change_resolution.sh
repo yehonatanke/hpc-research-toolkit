@@ -11,9 +11,9 @@
 #SBATCH --mem=4G
 #SBATCH --account=AIFAC_S02_060
 
-ROOT="/leonardo_work/AIFAC_S02_060/data/yk/debug/dl3dv_wai_dummy"
-LOG_DIR="/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/change_resolution"
-PYTHON_SCRIPT="/leonardo_work/AIFAC_S02_060/data/yk/debug/scripts/python/change_resolution.py"
+ROOT="$WORK/data/yk/debug/dl3dv_wai_dummy"
+LOG_DIR="$WORK/data/yk/debug/logs/change_resolution"
+PYTHON_SCRIPT="$WORK/data/yk/debug/scripts/python/change_resolution.py"
 
 mkdir -p "$LOG_DIR"
 
