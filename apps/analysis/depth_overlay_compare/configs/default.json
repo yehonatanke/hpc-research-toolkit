@@ -1,0 +1,10 @@
+{
+  "skip_step": 0,
+  "depths_to_compare": ["mvsanywhere_depth", "moge2_depth"],
+  "width_ratio": 4,
+  "height_ratio": 4,
+  "alpha": 0.6,
+  "log_path": "logs/depth_overlay.log",
+  "config_path": "configs/default.json",
+  "export_dir": "./output"
+}

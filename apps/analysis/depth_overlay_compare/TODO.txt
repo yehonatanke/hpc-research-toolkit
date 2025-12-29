@@ -1,3 +1,0 @@
-- change `modules` to `src`
-- move `compare_overlay.py` to `scripts` and change it to `run_compare.py`
-- change the output paths

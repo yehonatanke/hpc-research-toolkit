@@ -5,7 +5,7 @@ def print_args(args):
     print(f"===================================\n")
 
 
-def print_args_gray(args):
+def print_args_color(args):
     COLOR = "\033[92m"
     RESET = "\033[0m"
     print(f"\n{COLOR}===========[INFO] ARGS:=========== {RESET}")

@@ -1,0 +1,55 @@
+{
+    "version": 1,
+    "disable_existing_loggers": false,
+    "formatters": {
+        "file_formatter": {
+            "()": "research_utils.logging.handlers.FileFormatter"
+        },
+        "console_formatter": {
+            "()": "research_utils.logging.handlers.ConsoleFormatter"
+        }
+    },
+    "handlers": {
+        "file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "DEBUG",
+            "formatter": "file_formatter",
+            "filename": "logs/app.log",
+            "maxBytes": 52428800,
+            "backupCount": 10,
+            "encoding": "utf8",
+            "delay": true
+        },
+        "stdout": {
+            "class": "logging.StreamHandler",
+            "formatter": "console_formatter",
+            "level": "DEBUG",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "urllib3": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout",
+                "file"
+            ],
+            "propagate": false
+        },
+        "asyncio": {
+            "level": "DEBUG",
+            "handlers": [
+                "stdout",
+                "file"
+            ],
+            "propagate": false
+        }
+    },
+    "root": {
+        "level": "DEBUG",
+        "handlers": [
+            "stdout",
+            "file"
+        ]
+    }
+}

@@ -1,0 +1,30 @@
+import cv2
+import numpy as np
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+def get_rgb_image(rgb_path: str):
+    img = cv2.imread(rgb_path)
+    if img is None:
+        logger.error("RGB file not found", extra={"path": rgb_path})
+        raise FileNotFoundError(f"Error reading RGB: {rgb_path}")
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    return img
+
+
+def get_depth_map(depth_path: str):
+    if depth_path.endswith(".npy"):
+        depth_map = np.load(depth_path)
+        logger.debug("Depth file is a numpy array", extra={"path": depth_path})
+    else:
+        depth_map = cv2.imread(depth_path, cv2.IMREAD_UNCHANGED)
+        logger.debug("Depth file is not a numpy array", extra={"path": depth_path})
+
+    if depth_map is None:
+        logger.error("Depth file not found", extra={"path": depth_path})
+        raise FileNotFoundError(f"Error reading Depth: {depth_path}")
+
+    return depth_map
