@@ -2,18 +2,18 @@
     "version": 1,
     "disable_existing_loggers": false,
     "formatters": {
-        "readable_file": {
-            "()": "research_utils.logging.handlers.ReadableColorFormatterFile"
+        "file_formatter": {
+            "()": "research_utils.logging.handlers.FileFormatter"
         },
-        "readable_color_console": {
-            "()": "research_utils.logging.handlers.ReadableColorFormatterConsole"
+        "console_formatter": {
+            "()": "research_utils.logging.handlers.ConsoleFormatter"
         }
     },
     "handlers": {
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "DEBUG",
-            "formatter": "readable_file",
+            "formatter": "file_formatter",
             "filename": "logs/app.log",
             "maxBytes": 52428800,
             "backupCount": 10,
@@ -22,7 +22,7 @@
         },
         "stdout": {
             "class": "logging.StreamHandler",
-            "formatter": "readable_color_console",
+            "formatter": "console_formatter",
             "level": "DEBUG",
             "stream": "ext://sys.stdout"
         }

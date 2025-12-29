@@ -6,14 +6,14 @@
             "format": "%(asctime)s | %(levelname)-7s | %(name)s:%(funcName)s:%(lineno)d - %(message)s",
             "datefmt": "%d-%m-%Y %H:%M:%S"
         },
-        "file_color": {
-            "()": "research_utils.logging.handlers.ReadableColorFormatterFile"
+        "file_formatter": {
+            "()": "research_utils.logging.handlers.FileFormatter"
         }, 
         "console_text": {
             "format": "%(asctime)s | %(levelname)-7s | %(name)s:%(funcName)s:%(lineno)d - %(message)s",
             "datefmt": "%d-%m-%Y %H:%M:%S"
         },
-        "file_json": {
+        "json_formatter": {
             "()": "research_utils.logging.handlers.JSONFormatter",
             "fmt_keys": {
                 "level": "levelname",
@@ -21,25 +21,22 @@
                 "line": "lineno"
             }
         },
-        "console_legacy_color": {
-            "()": "research_utils.logging.handlers.ColoredFormatter"
-        },
-        "console_color": {
-            "()": "research_utils.logging.handlers.ReadableColorFormatterConsole"
+        "console_formatter": {
+            "()": "research_utils.logging.handlers.ConsoleFormatter"
         }
     },
     "handlers": {
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
-            "formatter": "file_color",
+            "formatter": "file_formatter",
             "filename": "logs/app.log",
             "maxBytes": 10485760,
             "backupCount": 5
         },
         "stdout": {
             "class": "logging.StreamHandler",
-            "formatter": "console_color",
+            "formatter": "console_formatter",
             "level": "INFO", 
             "stream": "ext://sys.stdout"
         }
