@@ -1,8 +1,11 @@
 #!/bin/bash
 
+# Set PROJECT_ROOT to your project base directory (e.g., export PROJECT_ROOT=/path/to/project)
+PROJECT_ROOT="${PROJECT_ROOT:-${WORK:-$HOME}/project}"
+
 #SBATCH --job-name=download_hf_moge
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/download_hf_moge/%j.out
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/download_hf_moge/%j.err
+#SBATCH --output=${PROJECT_ROOT}/debug/logs/download_hf_moge/%j.out
+#SBATCH --error=${PROJECT_ROOT}/debug/logs/download_hf_moge/%j.err
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -10,18 +13,18 @@
 #SBATCH --partition=lrd_all_serial
 #SBATCH --qos=normal
 #SBATCH --mem=4G
-#SBATCH --account=AIFAC_S02_060
+#SBATCH --account=${ACCOUNT}
 
 # specific
-ROOT_DIR="/leonardo_work/AIFAC_S02_060/data/yk"
-TARGET_DIR="$ROOT_DIR/repos/map-anything/yk_moge"
+ROOT_DIR="${PROJECT_ROOT}"
+TARGET_DIR="${ROOT_DIR}/repos/map-anything/yk_moge"
 
 mkdir -p "$TARGET_DIR"
 
 # general
-VENV="$ROOT_DIR/envs/map-anything-venv/bin/activate"
-MAPANYTHING_DIR="$ROOT_DIR/repos/map-anything"
-LOG_DIR="$ROOT_DIR/debug/logs/download_hf_moge"
+VENV="${ROOT_DIR}/envs/map-anything-venv/bin/activate"
+MAPANYTHING_DIR="${ROOT_DIR}/repos/map-anything"
+LOG_DIR="${ROOT_DIR}/debug/logs/download_hf_moge"
 
 mkdir -p "$LOG_DIR"
 

@@ -1,7 +1,10 @@
 #!/bin/bash
+# Set PROJECT_ROOT to your project base directory (e.g., export PROJECT_ROOT=/path/to/project)
+PROJECT_ROOT="${PROJECT_ROOT:-${YK:-${WORK:-$HOME}/project}}"
+
 #SBATCH --job-name=create_da3_dummy_dataset
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/da3/create_dummy_dataset/%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/da3/create_dummy_dataset/%j.err.log
+#SBATCH --output=${PROJECT_ROOT}/debug/logs/da3/create_dummy_dataset/%j.out.log
+#SBATCH --error=${PROJECT_ROOT}/debug/logs/da3/create_dummy_dataset/%j.err.log
 #SBATCH --time=00:40:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -9,23 +12,23 @@
 #SBATCH --gres=gpu:1
 #SBATCH --partition=boost_usr_prod
 #SBATCH --qos=normal
-#SBATCH --account=AIFAC_S02_060
+#SBATCH --account=${ACCOUNT}
 
 
 TASK_NAME="create_da3_dummy_dataset"
 
-ROOT_DIR=$YK
-DATASET_PATH="$ROOT_DIR/debug/dl3dv_wai_dummy"
-IMAGES_DIR="$DATASET_PATH"
+ROOT_DIR="${PROJECT_ROOT}"
+DATASET_PATH="${ROOT_DIR}/debug/dl3dv_wai_dummy"
+IMAGES_DIR="${DATASET_PATH}"
 
-OUTPUT_DIR="$ROOT_DIR/debug/da3_dummy/dense"
+OUTPUT_DIR="${ROOT_DIR}/debug/da3_dummy/dense"
 
 IMAGES_DISTORTED="images_distorted"
 
-VENV="$ROOT_DIR/envs/depth-anything-env/bin/activate"
-DEPTH_ANYTHING_DIR="$ROOT_DIR/repos/Depth-Anything-3"
-LOG_DIR="$ROOT_DIR/debug/logs/da3/create_dummy_dataset"
-MODEL_DIR="$ROOT_DIR/repos/Depth-Anything-3/models/DA3NESTED-GIANT-LARGE-1.1"
+VENV="${ROOT_DIR}/envs/depth-anything-env/bin/activate"
+DEPTH_ANYTHING_DIR="${ROOT_DIR}/repos/Depth-Anything-3"
+LOG_DIR="${ROOT_DIR}/debug/logs/da3/create_dummy_dataset"
+MODEL_DIR="${ROOT_DIR}/repos/Depth-Anything-3/models/DA3NESTED-GIANT-LARGE-1.1"
 DESCRIPTION="Run Depth Anything 3 on image folder"
 
 # Parameters
@@ -125,24 +128,26 @@ echo -e "[SLURM][INFO][TIME] Duration: $(($duration / 60)) minutes and $(($durat
 echo -e "[INFO] --- END OF JOB ---"
 
 
-for SCENE_DIR in $DA3_DUMMY/*/; do
-    SCENE_NAME=$(basename "$SCENE_DIR") 
-    for FRAME in "${FRAMES[@]}"; do
-    echo -e ${SCENE_DIR}"rgb/dense/frame_${FRAME}.png" \
-    echo -e ${SCENE_DIR}"depth/dense/frame_${FRAME}.npy" \
-    echo -e ${DENSE_OVERLAY_OUT}"DA3_DUMMY"/${SCENE_NAME} 
-done 
-done 
+# Note: The following sections use environment variables $DA3_DUMMY and $DENSE_OVERLAY_OUT
+# These should be set before running the script or replaced with ${PROJECT_ROOT}/... paths
+# for SCENE_DIR in ${DA3_DUMMY:-${ROOT_DIR}/debug/da3_dummy}/*/; do
+#     SCENE_NAME=$(basename "$SCENE_DIR") 
+#     for FRAME in "${FRAMES[@]}"; do
+#     echo -e ${SCENE_DIR}"rgb/dense/frame_${FRAME}.png" \
+#     echo -e ${SCENE_DIR}"depth/dense/frame_${FRAME}.npy" \
+#     echo -e ${DENSE_OVERLAY_OUT:-${ROOT_DIR}/debug/output}"DA3_DUMMY"/${SCENE_NAME} 
+# done 
+# done 
 
-# for da3 dummy (new)
-for SCENE_DIR in $DA3_DUMMY/*/; do
-SCENE_NAME=$(basename "$SCENE_DIR")
-for FRAME in "${FRAMES[@]}"; do
-run_depth_overlay \
---rgb_path ${SCENE_DIR}"dense/rgb/frame_${FRAME}.png" \
---depth_path ${SCENE_DIR}"dense/depth/frame_${FRAME}.npy" \
---export-dir ${DENSE_OVERLAY_OUT}"DA3_DUMMY"/${SCENE_NAME} \
---model_name  depth-anything \
---comment "CONF_THRESH_PERCENTILE=30, ALIGN_TO_INPUT_EXT_SCALE=True, PROCESS_RES=480, NUM_MAX_POINTS=2000000 PROCESS_RES_METHOD=upper_bound_resize" 
-done
-done
+# # for da3 dummy (new)
+# for SCENE_DIR in ${DA3_DUMMY:-${ROOT_DIR}/debug/da3_dummy}/*/; do
+# SCENE_NAME=$(basename "$SCENE_DIR")
+# for FRAME in "${FRAMES[@]}"; do
+# run_depth_overlay \
+# --rgb_path ${SCENE_DIR}"dense/rgb/frame_${FRAME}.png" \
+# --depth_path ${SCENE_DIR}"dense/depth/frame_${FRAME}.npy" \
+# --export-dir ${DENSE_OVERLAY_OUT:-${ROOT_DIR}/debug/output}"DA3_DUMMY"/${SCENE_NAME} \
+# --model_name  depth-anything \
+# --comment "CONF_THRESH_PERCENTILE=30, ALIGN_TO_INPUT_EXT_SCALE=True, PROCESS_RES=480, NUM_MAX_POINTS=2000000 PROCESS_RES_METHOD=upper_bound_resize" 
+# done
+# done

@@ -12,9 +12,23 @@ run_depth_overlay() {
     popd > /dev/null
 }
 
+run_depth_compare() {
+    # repo root
+    local REPO_DIR="$DEPTH_OVERLAY_COMPARE"
+    
+    # save current dir and move to repo
+    pushd "$REPO_DIR" > /dev/null || return
+    
+    python -m scripts.compare_overlay "$@"
+    
+    # Return to previous dir
+    popd > /dev/null
+}
+
 # sbatch wrapper 
 submit() {
 
+    local ACCOUNT="AIFAC_S02_060"
     local DEBUG="$WORK/data/yk/debug"
     sbatch --account=$ACCOUNT \
            --output=$DEBUG/output/%j.out \

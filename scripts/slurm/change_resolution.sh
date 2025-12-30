@@ -1,7 +1,10 @@
 #!/bin/bash
+# Set PROJECT_ROOT to your project base directory (e.g., export PROJECT_ROOT=/path/to/project)
+PROJECT_ROOT="${PROJECT_ROOT:-${WORK:-$HOME}/project}"
+
 #SBATCH --job-name=change_resolution
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/change_resolution/%j.out
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/change_resolution/%j.err
+#SBATCH --output=${PROJECT_ROOT}/debug/logs/change_resolution/%j.out
+#SBATCH --error=${PROJECT_ROOT}/debug/logs/change_resolution/%j.err
 #SBATCH --time=01:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -9,11 +12,11 @@
 #SBATCH --partition=lrd_all_serial
 #SBATCH --qos=normal
 #SBATCH --mem=4G
-#SBATCH --account=AIFAC_S02_060
+#SBATCH --account=${ACCOUNT}
 
-ROOT="$WORK/data/yk/debug/dl3dv_wai_dummy"
-LOG_DIR="$WORK/data/yk/debug/logs/change_resolution"
-PYTHON_SCRIPT="$WORK/data/yk/debug/scripts/python/change_resolution.py"
+ROOT="${PROJECT_ROOT}/debug/dl3dv_wai_dummy"
+LOG_DIR="${PROJECT_ROOT}/debug/logs/change_resolution"
+PYTHON_SCRIPT="${PROJECT_ROOT}/code/scripts/python/change_resolution.py"
 
 mkdir -p "$LOG_DIR"
 

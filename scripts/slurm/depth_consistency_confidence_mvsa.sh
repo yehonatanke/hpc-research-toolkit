@@ -2,9 +2,12 @@
 
 # This script is used to implement `data_processing/scripts/depth_consistency_confidence.py` with MVSA.
 
+# Set PROJECT_ROOT to your project base directory (e.g., export PROJECT_ROOT=/path/to/project)
+PROJECT_ROOT="${PROJECT_ROOT:-${WORK:-$HOME}/project}"
+
 #SBATCH --job-name=depth_consistency_confidence_mvsa
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/depth_consistency_confidence_mvsa/%j.out
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/depth_consistency_confidence_mvsa/%j.err
+#SBATCH --output=${PROJECT_ROOT}/debug/logs/depth_consistency_confidence_mvsa/%j.out
+#SBATCH --error=${PROJECT_ROOT}/debug/logs/depth_consistency_confidence_mvsa/%j.err
 #SBATCH --time=01:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -12,17 +15,17 @@
 #SBATCH --gres=gpu:1
 #SBATCH --partition=boost_usr_prod
 #SBATCH --qos=normal
-#SBATCH --account=AIFAC_S02_060
+#SBATCH --account=${ACCOUNT}
 
 # specific
-ROOT_DIR="/leonardo_work/AIFAC_S02_060/data/yk"
-DATASET_PATH="$ROOT_DIR/debug/dl3dv_wai_dummy"
-CONFIGS="$ROOT_DIR/repos/map-anything/data_processing/wai_processing/configs/depth_consistency_confidence/depth_consistency_confidence_mvsa.yaml" 
+ROOT_DIR="${PROJECT_ROOT}"
+DATASET_PATH="${ROOT_DIR}/debug/dl3dv_wai_dummy"
+CONFIGS="${ROOT_DIR}/repos/map-anything/data_processing/wai_processing/configs/depth_consistency_confidence/depth_consistency_confidence_mvsa.yaml" 
 
 # general
-VENV="$ROOT_DIR/envs/map-anything-venv/bin/activate"
-MAPANYTHING_DIR="$ROOT_DIR/repos/map-anything"
-LOG_DIR="$ROOT_DIR/debug/logs/depth_consistency_confidence_mvsa"
+VENV="${ROOT_DIR}/envs/map-anything-venv/bin/activate"
+MAPANYTHING_DIR="${ROOT_DIR}/repos/map-anything"
+LOG_DIR="${ROOT_DIR}/debug/logs/depth_consistency_confidence_mvsa"
 
 mkdir -p "$LOG_DIR"
 

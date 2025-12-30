@@ -1,7 +1,10 @@
 #!/bin/bash
+# Set PROJECT_ROOT to your project base directory (e.g., export PROJECT_ROOT=/path/to/project)
+PROJECT_ROOT="${PROJECT_ROOT:-${WORK:-$HOME}/project}"
+
 #SBATCH --job-name=env_test
-#SBATCH --output=$WORK/data/yk/debug/logs/env_test/%j.out
-#SBATCH --error=$WORK/data/yk/debug/logs/env_test/%j.err
+#SBATCH --output=${PROJECT_ROOT}/debug/logs/env_test/%j.out
+#SBATCH --error=${PROJECT_ROOT}/debug/logs/env_test/%j.err
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --time=00:05:00
@@ -10,7 +13,7 @@
 #SBATCH --partition=lrd_all_serial
 #SBATCH --qos=normal
 #SBATCH --mem=4G
-#SBATCH --account=AIFAC_S02_060
+#SBATCH --account=${ACCOUNT}
 
 echo "Testing Default Slurm Variables ---"
 echo "HOME: $HOME"

@@ -37,7 +37,7 @@ def plot_exr_depth(file_path, save_path):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--file_path", type=str, required=True)
-    parser.add_argument("--save_path", type=str, required=True, default='/leonardo_work/AIFAC_S02_060/data/yk/debug/output/depth_maps')
+    parser.add_argument("--save_path", type=str, required=True, default='$DEBUG/output/depth_maps')
     args = parser.parse_args()
 
     plot_exr_depth(args.file_path, args.save_path)
