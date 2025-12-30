@@ -5,6 +5,19 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def read_rgb(rgb_path):
+    """
+    read rgb image
+    returns:
+        - rgb_img: rgb image
+    """
+    rgb_img = cv2.imread(rgb_path)
+    if rgb_img is None:
+        logger.error(f"Error reading RGB: {rgb_path}.")
+        raise FileNotFoundError(f"Error reading RGB: {rgb_path}")
+    return rgb_img
+
+
 def get_rgb_image(rgb_path: str):
     img = cv2.imread(rgb_path)
     if img is None:

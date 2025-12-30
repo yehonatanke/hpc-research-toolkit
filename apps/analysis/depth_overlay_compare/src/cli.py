@@ -39,9 +39,9 @@ def parse_args():
     )
     parser.add_argument("--scene_root", type=str, required=True, help="Path to scene root directory")
     parser.add_argument(
-        "--depths_to_compare",
-        type=list,
-        default=config.get("depths_to_compare"),
+        "--models",
+        nargs="+",
+        default=config.get("models"),
         choices=["mvsanywhere", "moge2", "mapanything"],
         help="Models to compare: 'mvsanywhere' | 'moge2' | 'mapanything'",
     )
@@ -62,10 +62,6 @@ def parse_args():
         default=config.get("export_dir"),
         help="Path to output directory",
     )
-    # parser.add_argument(
-    #     "--save", action="store_true", default=False, help="If True, save output images (default: False)"
-    # )
-    # parser.add_argument("--debug", type=int, default=0, choices=[0, 1, 2, 3], help="Debug level (default: 0)")
     parser.add_argument("--log_path", type=str, default=config.get("log_path"))
     parser.add_argument("--comment", type=str, default="", help="Comment for the output image file")
 
@@ -76,7 +72,7 @@ def parse_args():
         logger.debug("Log path from config:", extra={"path": log_path})
         logger.debug("Absolute log path:", extra={"path": os.path.abspath(log_path)})
 
-    return parser
+    return parser.parse_args()
 
 
 def get_parserOLD():

@@ -1,6 +1,7 @@
 import os
 import logging
 import json
+from pathlib import Path
 
 
 logger = logging.getLogger(__name__)
@@ -24,11 +25,16 @@ def extract_dense_paths(dense_dir: str, model: str = None) -> dict:
 
     result = {"rgb_paths": [], "frame_names": [], "depth_paths": []}
 
-    # get `/dense_dir/depth/frame_00001.png` etc.
-    for file in os.listdir(rgb_path):
-        result["frame_names"].append(file.split(".")[0])
+    # get `/dense_dir/depth/frame_00001.npy` etc.
+    # Sort files to ensure consistent ordering (matching scene_meta.json order)
+    files = sorted(os.listdir(rgb_path))
+    for file in files:
+        frame_name = file.split(".")[0]
+        result["frame_names"].append(frame_name)
         result["rgb_paths"].append(os.path.join(rgb_path, file))
-        result["depth_paths"].append(os.path.join(depth_path, file))
+        # Depth files are .npy, not .png
+        depth_file = f"{frame_name}.npy"
+        result["depth_paths"].append(os.path.join(depth_path, depth_file))
 
     logger.info(f"model: {model} --> extracted {len(result['depth_paths'])} depth paths")
     return result
@@ -119,6 +125,28 @@ def extract_meta_paths(scene_meta_path, models=["mvsanywhere", "moge2", "mapanyt
 
     return rgb_paths, frame_names, depth_paths_1, depth_paths_2
 
+
+def get_unique_path(filepath: Path) -> Path:
+    """
+    Returns a unique Path object. If the original path exists,
+    it appends a counter (e.g., _1, _2) before the file extension.
+    """
+    if not filepath.exists():
+        return filepath
+
+    stem = filepath.stem
+    suffix = filepath.suffix
+    parent = filepath.parent
+    
+    counter = 1
+    while True:
+        new_filename = f"{stem}_{counter}{suffix}"
+        new_filepath = parent / new_filename
+        
+        if not new_filepath.exists():
+            return new_filepath
+        
+        counter += 1
 
 def ensure_dir(dir_path: str) -> None:
     """

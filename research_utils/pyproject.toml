@@ -12,6 +12,7 @@ dependencies = [
     "numpy",
     "opencv-python",
     "matplotlib",
+    "tqdm",
 ]
 
 [project.optional-dependencies]

@@ -1,6 +1,6 @@
 {
-  "skip_step": 0,
-  "depths_to_compare": ["mvsanywhere_depth", "moge2_depth"],
+  "skip_step": 50,
+  "models": ["mvsanywhere", "moge2", "mapanything"],
   "width_ratio": 4,
   "height_ratio": 4,
   "alpha": 0.6,
