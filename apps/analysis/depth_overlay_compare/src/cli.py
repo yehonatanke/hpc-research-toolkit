@@ -42,8 +42,8 @@ def parse_args():
         "--models",
         nargs="+",
         default=config.get("models"),
-        choices=["mvsanywhere", "moge2", "mapanything"],
-        help="Models to compare: 'mvsanywhere' | 'moge2' | 'mapanything'",
+        choices=["mvsanywhere", "moge2", "depthanything"],
+        help="Models to compare: 'mvsanywhere' | 'moge2' | 'depthanything'",
     )
     parser.add_argument(
         "--dense_dir", type=str, help="Path to dense directory. must be specified if 'dense' is in --depths_to_compare"

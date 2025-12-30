@@ -20,7 +20,7 @@ if research_utils_path not in sys.path:
     sys.path.insert(0, research_utils_path)
 
 from src.cli import parse_args
-from research_utils import plot_overlay, print_args, print_args_color, plot_comparison_multiple, plot_comparison_multiple_compact
+from research_utils import print_args_color, plot_comparison_multiple, plot_comparison_multiple_compact
 
 
 logger = logging.getLogger(__name__)

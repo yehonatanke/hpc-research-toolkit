@@ -1,6 +1,6 @@
 {
   "skip_step": 50,
-  "models": ["mvsanywhere", "moge2", "mapanything"],
+  "models": ["mvsanywhere", "moge2", "depthanything"],
   "width_ratio": 4,
   "height_ratio": 4,
   "alpha": 0.6,

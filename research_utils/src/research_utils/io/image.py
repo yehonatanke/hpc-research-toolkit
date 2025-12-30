@@ -41,3 +41,22 @@ def get_depth_map(depth_path: str):
         raise FileNotFoundError(f"Error reading Depth: {depth_path}")
 
     return depth_map
+
+
+def get_image_dimensions(image_path: str):
+    """
+    Get image dimensions (width, height) from an image file.
+    
+    Args:
+        image_path: Path to the image file
+        
+    Returns:
+        Tuple of (width, height) in pixels, or (None, None) if image cannot be read
+    """
+    img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    if img is not None:
+        height, width = img.shape[:2]
+        logger.debug("Image dimensions detected", extra={"path": image_path, "width": width, "height": height})
+        return width, height
+    logger.warning("Could not read image to get dimensions", extra={"path": image_path})
+    return None, None

@@ -20,8 +20,9 @@ def extract_dense_paths(dense_dir: str, model: str = None) -> dict:
         logger.warning("Function got no model to extract")
         return None
 
-    rgb_path = os.path.join(dense_dir, "rgb")
-    depth_path = os.path.join(dense_dir, "depth")
+    # dense_dir/dense/rgb or dense_dir/rgb
+    rgb_path = _get_dense_path(dense_dir, "rgb") 
+    depth_path = _get_dense_path(dense_dir, "depth")
 
     result = {"rgb_paths": [], "frame_names": [], "depth_paths": []}
 
@@ -40,15 +41,23 @@ def extract_dense_paths(dense_dir: str, model: str = None) -> dict:
     return result
 
 
-def get_abs_path(root: str, path: str) -> str:
+def _get_dense_path(dense_dir: str, sub_dir: str) -> str:
     """
-    Returns the absolute path of the given path
+    Adds "dense" suffix to the path
     Args:
-        - root: root directory
-        - path: relative path to the file
+        - path: path to the file
     Returns:
-        - absolute path of the file in the root directory
+        - path with "dense" suffix
+    Note: This is due to dense_dummy and dense test variations
     """
+    if os.path.exists(os.path.join(dense_dir, sub_dir)):
+        # <dense_dir>/<sub_dir>
+        return os.path.join(dense_dir, sub_dir)
+    # <dense_dir>/dense/<sub_dir>
+    return os.path.join(dense_dir, "dense", sub_dir)
+
+
+def get_abs_path(root: str, path: str) -> str:
     return os.path.join(root, path)
 
 
@@ -137,16 +146,17 @@ def get_unique_path(filepath: Path) -> Path:
     stem = filepath.stem
     suffix = filepath.suffix
     parent = filepath.parent
-    
+
     counter = 1
     while True:
         new_filename = f"{stem}_{counter}{suffix}"
         new_filepath = parent / new_filename
-        
+
         if not new_filepath.exists():
             return new_filepath
-        
+
         counter += 1
+
 
 def ensure_dir(dir_path: str) -> None:
     """

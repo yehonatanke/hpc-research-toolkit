@@ -4,11 +4,16 @@ import cv2
 import numpy as np
 from pathlib import Path
 from tqdm import tqdm
-from research_utils.utils.io import ensure_dir, get_unique_path, get_save_path
-from research_utils.utils.log import logger
-from research_utils.utils.data import extract_wai_meta_paths, extract_dense_paths, subsample_paths
-from research_utils.utils.plot import get_plot_dimensions, process_depth
-from research_utils.utils.data import extract_wai_meta_paths, extract_dense_paths, subsample_paths
+from typing import List
+from research_utils.core.path import ensure_dir, get_save_path
+from research_utils.core.path import get_unique_path 
+from research_utils.core.args import print_args_color  
+from research_utils.core.util import subsample_paths
+from research_utils.core.path import extract_wai_meta_paths, extract_dense_paths
+from research_utils.viz.plot import get_plot_dimensions, process_depth
+import logging
+
+logger = logging.getLogger(__name__)
 
 # problems with depth
 def plot_depth_comparison_grid(
@@ -147,11 +152,11 @@ def plot_comparison_multiple_compact(
                 if rgb_path_for_save is None:
                     rgb_path_for_save = result["rgb_paths"][0]
                 sets["moge2"] = result
-        elif model == "mapanything":
+        elif model == "depthanything":
             result = extract_dense_paths(dense_dir, model)
             result = subsample_paths(result, skip_step)
             if result and result.get("rgb_paths"):
-                sets["mapanything"] = result
+                sets["depthanything"] = result
 
     non_empty_lengths = {k: len(v.get("rgb_paths", [])) for k, v in sets.items() if v and v.get("rgb_paths")}
     if not non_empty_lengths:
