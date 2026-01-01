@@ -1,5 +1,5 @@
 {
-  "log_path": "logs/depth_overlay.log",
+  "log_config": "configs/logging/default_logging.json",
   "config_path": "configs/default.json",
   "export_dir": "./output"
 }

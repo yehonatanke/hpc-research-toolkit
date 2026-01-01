@@ -1,0 +1,12 @@
+{
+    "log_config": "configs/logging/re10k_dense_logging.json",
+    "config_path": "configs/default.json",
+    "export_dir": "./output/re10k_dense", 
+    "rgb_path": "$WORK/data/re10k__dense_da3/00a5a2af678f37d5/dense/rgb/00025.png",
+    "depth_path": "$WORK/data/re10k__dense_da3/00a5a2af678f37d5/dense/depth/00025.npy",
+    "model_name": "DA3-NESTED-GIANT-LARGE-1.1",
+    "alpha": 0.6,
+    "comment": "first test [.../re10k__dense_da3]",
+    "dense_dataset": true
+  }
+  

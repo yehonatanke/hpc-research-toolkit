@@ -3,6 +3,20 @@ import os
 from typing import Dict, Any, Optional
 
 
+def _expand_env_vars(obj):
+    """
+    Recursively expand environment variables in the object.
+    Only processes strings; dicts and lists are traversed recursively.
+    """
+    if isinstance(obj, dict):
+        return {k: _expand_env_vars(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_expand_env_vars(item) for item in obj]
+    elif isinstance(obj, str):
+        return os.path.expandvars(obj)
+    else:
+        return obj
+
 def load_config(
     config_path: Optional[str] = None,
     base_dir: Optional[str] = None,
@@ -11,6 +25,10 @@ def load_config(
 ) -> Dict[str, Any]:
     """
     Load default configuration from a JSON file.
+
+    This function will expand environment variables in any string value in the loaded config.
+    For example, if your JSON contains {"data_dir": "$WORK/data"}, and $WORK is set in your environment,
+    the returned dictionary will have {"data_dir": "/expanded/path/data"}.
 
     Args:
         - config_path: Direct path to the config file. If provided, this takes precedence.
@@ -21,7 +39,8 @@ def load_config(
             or cannot be loaded.
 
     Returns:
-        - Dictionary containing the loaded configuration values, merged with default_values.
+        - Dictionary containing the loaded configuration values, merged with default_values,
+          and with environment variables expanded in any string values.
     """
     if default_values is None:
         default_values = {}
@@ -65,14 +84,16 @@ def load_config(
                 loaded_config = json.load(f)
                 # Merge with defaults (loaded config takes precedence)
                 result = {**default_values, **loaded_config}
+                # Expand environment variables in any string fields
+                result = _expand_env_vars(result)
                 return result
         except (json.JSONDecodeError, IOError) as e:
             print(f"Warning: Could not load default config from {config_path}: {e}")
             print("Using provided defaults.")
-            return default_values.copy()
+            return _expand_env_vars(default_values.copy())
     else:
         # Config file doesn't exist, return defaults
         if config_path:
             print(f"Warning: Config file not found at {config_path}")
             print("Using provided defaults.")
-        return default_values.copy()
+        return _expand_env_vars(default_values.copy())

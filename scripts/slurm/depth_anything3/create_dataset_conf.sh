@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# create dummy dataset with different confidence thresholds
+
 #SBATCH --job-name=create_da3_dummy_dataset_conf_thresh_10
 #SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/da3/create_dummy_dataset/dif_confs/10/%j.out.log
 #SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/debug/logs/da3/create_dummy_dataset/dif_confs/10/%j.err.log

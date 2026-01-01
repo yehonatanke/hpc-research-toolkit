@@ -1,11 +1,11 @@
 # Aesthetic variables
-RESET='\[\e[0m\]'       # reset all attributes
+RESET='\[\e[0m\]'       
 BOLD='\[\e[1m\]'        
-WHITE='\[\e[97m\]'      # bright white
-GRAY='\[\e[90m\]'       # light gray
-CYAN='\[\e[96m\]'       # bright cyan
-YELLOW='\[\e[93m\]'     # bright yellow
-GREEN='\[\e[92m\]'      # bright green
+WHITE='\[\e[97m\]'    
+GRAY='\[\e[90m\]'      
+CYAN='\[\e[96m\]'      
+YELLOW='\[\e[93m\]'     
+GREEN='\[\e[92m\]'      
 NEWLINE=$'\n'
 DARK_WHITE='\033[0;37m' # for github branch
 GREEN_ANSI='\e[38;5;46m'
@@ -36,7 +36,8 @@ export DIR_SLURM="$DEBUG/scripts/slurm"
 export DUMMY_DL3DV="$DEBUG/dl3dv_wai_dummy"
 export REPOS="$YK/repos"
 export MAP_ANYTHING="$REPOS/map-anything"
-
+export ENVS="$YK/envs"
+export SLURM="$CODE/scripts/slurm"
 
 # dummy sata & samples
 export SAMPLE_1="1K_0a1b7c20a92c43c6b8954b1ac909fb2f0fa8b2997b80604bc8bbec80a1cb2da3"
