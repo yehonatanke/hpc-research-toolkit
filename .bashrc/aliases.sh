@@ -100,4 +100,8 @@ alias goto_code="cd $CODE"
 alias open_bashrc="vi $BASHRC"
 alias load_bashrc="source $BASHRC"
 
+# slurm
+alias sq="squeue -u $USER"
+
+# github
 alias gacp='f() { git add . && git commit -m "$1" && git push -u origin main; }; f'
