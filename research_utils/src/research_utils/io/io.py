@@ -1,23 +1,110 @@
 import json
 import os
-from typing import Dict, Any, Optional
+import yaml
+import inspect
+from typing import Dict, Any, Optional, List
 
 
-def _expand_env_vars(obj):
+def _expand_env_vars_v1(obj):
     """
     Recursively expand environment variables in the object.
     Only processes strings; dicts and lists are traversed recursively.
     """
+    if isinstance(obj, dict):
+        return {k: _expand_env_vars_v1(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_expand_env_vars_v1(item) for item in obj]
+    elif isinstance(obj, str):
+        return os.path.expandvars(obj)
+    else:
+        return obj
+
+
+def _expand_env_vars(obj: Any) -> Any:
     if isinstance(obj, dict):
         return {k: _expand_env_vars(v) for k, v in obj.items()}
     elif isinstance(obj, list):
         return [_expand_env_vars(item) for item in obj]
     elif isinstance(obj, str):
         return os.path.expandvars(obj)
-    else:
-        return obj
+    return obj
+
+
+def _get_caller_directory() -> Optional[str]:
+    try:
+        frame = inspect.currentframe()
+        if frame and frame.f_back and frame.f_back.f_back:
+            caller_file = frame.f_back.f_back.f_globals.get("__file__", "")
+            if caller_file:
+                return os.path.dirname(os.path.abspath(caller_file))
+    except Exception:
+        pass
+    return None
+
+
+def _find_config_in_parents(start_dir: str, filenames: List[str], depth: int = 3) -> Optional[str]:
+    current_dir = start_dir
+    for _ in range(depth):
+        config_dir = os.path.join(current_dir, "configs")
+        for name in filenames:
+            path = os.path.join(config_dir, name)
+            if os.path.exists(path):
+                return path
+        current_dir = os.path.dirname(current_dir)
+    return None
+
+
+def _resolve_config_path(config_path: Optional[str], base_dir: Optional[str], search_names: List[str]) -> Optional[str]:
+    if config_path:
+        return config_path
+
+    # Search from caller directory upwards
+    caller_dir = _get_caller_directory()
+    if caller_dir:
+        found = _find_config_in_parents(caller_dir, search_names)
+        if found:
+            return found
+
+    # Search in provided base_dir or local 'configs'
+    search_root = base_dir if base_dir else os.getcwd()
+    config_dir = os.path.join(search_root, "configs")
+    for name in search_names:
+        path = os.path.join(config_dir, name)
+        if os.path.exists(path):
+            return path
+
+    return None
+
+
+def _parse_file(path: str) -> Dict[str, Any]:
+    with open(path, "r") as f:
+        if path.lower().endswith((".yaml", ".yml")):
+            return yaml.safe_load(f) or {}
+        return json.load(f) or {}
+
 
 def load_config(
+    config_path: Optional[str] = None,
+    base_dir: Optional[str] = None,
+    config_filename: Optional[str] = None,
+    default_values: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    defaults = default_values or {}
+    search_names = [config_filename] if config_filename else ["default.yaml", "default.yml", "default.json"]
+
+    resolved_path = _resolve_config_path(config_path, base_dir, search_names)
+
+    if resolved_path and os.path.exists(resolved_path):
+        try:
+            loaded_config = _parse_file(resolved_path)
+            return _expand_env_vars({**defaults, **loaded_config})
+        except (json.JSONDecodeError, yaml.YAMLError, IOError) as e:
+            print(f"Warning: Failed to load {resolved_path}: {e}")
+
+    return _expand_env_vars(defaults.copy())
+
+
+def load_config_json(
     config_path: Optional[str] = None,
     base_dir: Optional[str] = None,
     config_filename: str = "default.json",

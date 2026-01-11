@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Argument 1: environment name
-# Argument 2: (optional) "no_color" disables colored output if set to "no_color" or "true"
+# arg 1: environment name, arg 2: (optional) "no_color" 
 ENV_NAME="$1"
 NO_COLOR_MSG=0
 if [[ "$2" == "no_color" || "$2" == "true" ]]; then
