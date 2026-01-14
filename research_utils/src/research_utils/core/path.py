@@ -7,6 +7,19 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 
+def sys_full_path(env_var, sub_path):
+    """
+    Input: sys_full_path($WORK, "data/")
+    Output: /home/user/work/data/
+    """
+    base = os.environ.get(env_var, "")
+    logger.debug("BASE", extra={"path": base})
+    logger.debug("RETURN PATH", extra={"path": os.path.join(base, sub_path)})
+    # print(f"BASE: {base}")
+    # print(f"RETURN PATH: {os.path.join(base, sub_path)}")
+    return os.path.join(base, sub_path)
+
+
 def extract_dense_paths(dense_dir: str, model: str = None) -> dict:
     """
     Extracts paths from dense directory
@@ -21,7 +34,7 @@ def extract_dense_paths(dense_dir: str, model: str = None) -> dict:
         return None
 
     # dense_dir/dense/rgb or dense_dir/rgb
-    rgb_path = _get_dense_path(dense_dir, "rgb") 
+    rgb_path = _get_dense_path(dense_dir, "rgb")
     depth_path = _get_dense_path(dense_dir, "depth")
 
     result = {"rgb_paths": [], "frame_names": [], "depth_paths": []}

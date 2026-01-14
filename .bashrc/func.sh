@@ -1,3 +1,36 @@
+string_diff() {
+    python3 - <<EOF
+import sys, difflib
+s1, s2 = "$1", "$2"
+RED, BLUE, RESET = "\033[38;5;160m", "\033[38;5;38m", "\033[0m"
+matcher = difflib.SequenceMatcher(None, s1, s2)
+diffs, res1, res2 = 0, [], []
+
+for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+    if tag == 'equal':
+        res1.append(f"{BLUE}{s1[i1:i2]}{RESET}")
+        res2.append(f"{BLUE}{s2[j1:j2]}{RESET}")
+    elif tag == 'replace':
+        diffs += max(i2 - i1, j2 - j1)
+        res1.append(f"{RED}{s1[i1:i2]}{RESET}")
+        res2.append(f"{RED}{s2[j1:j2]}{RESET}")
+    elif tag == 'delete':
+        diffs += (i2 - i1)
+        res1.append(f"{RED}{s1[i1:i2]}{RESET}")
+    elif tag == 'insert':
+        diffs += (j2 - j1)
+        res2.append(f"{RED}{s2[j1:j2]}{RESET}")
+
+print(f"DIFFERENCES: {diffs}")
+print(f"{''.join(res1)}\n{''.join(res2)}")
+EOF
+}
+
+load_python() {
+    module load python  # 2>&1 | head -n 1
+    echo "LOADED: $(python --version)"
+}
+
 # count files & dirs in a directory
 count_dir() {
     local target="${1:-.}"
@@ -172,7 +205,7 @@ print(f'Files skipped: {skipped}')
 }
 
 # print the statistics of npz files in a folder
-npz_stats() {
+npz_folder_stats() {
     python3 -c "
 import numpy as np
 import os
@@ -271,6 +304,10 @@ pngmat() {
     python3 -c "import PIL.Image, numpy as np; import sys; print(np.array(PIL.Image.open(sys.argv[1])))" "$1"
 }
 
+print_npz() {
+    python3 -c "import numpy as np; import sys; data = np.load(sys.argv[1]); [print(f'{k}:\n{data[k]}') for k in data.files]" "$1"
+}
+
 # view matrix of a file - npy, npz, or image
 viewmat() {
     python3 -c "
@@ -284,4 +321,22 @@ else:
     data = np.array(PIL.Image.open(path))
 print(data)
 " "$1"
+}
+
+print_colors(){
+    for code in {0..255}
+        do echo -e "\e[38;5;${code}m"'\\e[38;5;'"$code"m"\e[0m"
+    done
+}
+
+ansi_colors() {
+    # printf "\033[38;5;196mThis is color 196\033[0m\n"
+    for i in {0..255}; do
+        printf "\x1b[38;5;${i}m%4d " "$i"
+        printf "\x1b[38;5;${i}mThis is color ${i}\x1b[0m\n"
+        if [ $(((i + 1) % 16)) -eq 0 ]; then
+            printf "\x1b[0m\n"
+        fi
+    done
+    printf "\x1b[0m"
 }
