@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH --job-name=create_dense_dataset_for_re10k_DL3DV960_slurm
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/DL3DV960_slurm/%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/DL3DV960_slurm/%j.err.log
-#SBATCH --time=04:00:00
+#SBATCH --job-name=create_dense_dataset_for_re10k_50_samples_with_scale_and_conf
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/50_samples/%j.out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/50_samples/%j.err.log
+#SBATCH --time=01:40:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -12,10 +12,8 @@
 #SBATCH --qos=normal
 #SBATCH --account=AIFAC_S02_060
 
-# !! need to check bc i changed things
-
 # general
-TASK_NAME="create_dense_dataset_for_re10k [DATASET: DL3DV960_slurm] [with Scale Factor and Continous Confidence (outlier_mask.npy)]"
+TASK_NAME="create_dense_dataset_for_re10k [50 samples] [with Scale Factor and Continous Confidence (outlier_mask.npy)]"
 DESCRIPTION="Run Depth Anything 3 on RE10K dataset [create dense dataset] [50 samples] [for overfitting, to see if the model converges]"
 
 # job paths
@@ -82,14 +80,14 @@ cd "$DEPTH_ANYTHING_DIR"
 echo -e "${LOG_MSG} Current Directory: $(pwd)"
 
 echo -e "${LOG_MSG} Running DA3 on up to 50 scenes in the dataset..."
-# SCENE_COUNT=0
-# MAX_SCENES=50
+SCENE_COUNT=0
+MAX_SCENES=50
 
 for SCENE_DIR in $DATASET_PATH/*/; do
-    # if [ $SCENE_COUNT -ge $MAX_SCENES ]; then
-    #     echo -e "$LOG_MSG Reached limit of $MAX_SCENES scenes. Stopping iteration."
-    #     break
-    # fi
+    if [ $SCENE_COUNT -ge $MAX_SCENES ]; then
+        echo -e "$LOG_MSG Reached limit of $MAX_SCENES scenes. Stopping iteration."
+        break
+    fi
 
     SCENE_NAME=$(basename "$SCENE_DIR")
     mkdir -p "$OUTPUT_DIR/$SCENE_NAME"
@@ -112,13 +110,12 @@ for SCENE_DIR in $DATASET_PATH/*/; do
     echo -e "$LOG_MSG Scene Name: $SCENE_NAME"
     echo -e "$LOG_MSG RUNNING COMMAND:"
     printf "da3"
-    # printf " %s \\\n    " "${ARGS[@]}"
-    echo "da3 $(print_args ARGS)"
+    printf " %s \\\n    " "${ARGS[@]}"
     echo -e "\n"
 
     da3 "${ARGS[@]}"
     
-    # SCENE_COUNT=$((SCENE_COUNT + 1))
+    SCENE_COUNT=$((SCENE_COUNT + 1))
 done
 
 cd "$OUTPUT_DIR"

@@ -3,6 +3,7 @@ import json
 import os
 import logging
 import logging.config
+import yaml
 
 from typing_extensions import override
 from research_utils.core.path import path_with_parents
@@ -12,10 +13,29 @@ from research_utils.core.path import path_with_parents
 
 # Standard LogRecord attributes to exclude when identifying user-provided 'extra' fields
 LOG_RECORD_BUILTIN_ATTRS = {
-    "args", "asctime", "created", "exc_info", "exc_text", "filename", "funcName",
-    "levelname", "levelno", "lineno", "module", "msecs", "message", "msg",
-    "name", "pathname", "process", "processName", "relativeCreated",
-    "stack_info", "thread", "threadName", "taskName",
+    "args",
+    "asctime",
+    "created",
+    "exc_info",
+    "exc_text",
+    "filename",
+    "funcName",
+    "levelname",
+    "levelno",
+    "lineno",
+    "module",
+    "msecs",
+    "message",
+    "msg",
+    "name",
+    "pathname",
+    "process",
+    "processName",
+    "relativeCreated",
+    "stack_info",
+    "thread",
+    "threadName",
+    "taskName",
 }
 
 
@@ -266,7 +286,78 @@ class NonErrorFilter(logging.Filter):
         return record.levelno <= logging.WARNING
 
 
-def setup_logging(logging_config_path):
+class SilentLogger:
+    """empty object that ignores all calls"""
+
+    def debug(self, msg, *args, **kwargs):
+        pass
+
+    def info(self, msg, *args, **kwargs):
+        pass
+
+    def warning(self, msg, *args, **kwargs):
+        pass
+
+    def error(self, msg, *args, **kwargs):
+        pass
+
+    def critical(self, msg, *args, **kwargs):
+        pass
+
+    def isEnabledFor(self, level):
+        return False
+
+
+def get_optimized_logger(name: str):
+    # for optimization purposes, return a silent logger if not in debug mode
+    if not __debug__:
+        return SilentLogger()
+    return logging.getLogger(name)
+
+
+def setup_logging(config_path: str):
+    """Initialize logging from YAML or JSON config file."""
+    # for optimization purposes, block all logs below critical level at the Framework level
+    if not __debug__:
+        # block all logs below critical level at the Framework level
+        logging.disable(logging.CRITICAL)
+        return
+
+    if not os.path.exists(config_path):
+        logging.basicConfig(level=logging.INFO)
+        return
+
+    ext = os.path.splitext(config_path)[1].lower()
+
+    try:
+        with open(config_path, "rt", encoding="utf-8") as f:
+            if ext in (".yaml", ".yml"):
+                config = yaml.safe_load(f)
+            elif ext == ".json":
+                config = json.load(f)
+            else:
+                raise ValueError(f"Unsupported config format: {ext}")
+    except Exception as e:
+        logging.basicConfig(level=logging.INFO)
+        logging.error(f"Failed to load logging config {config_path}: {e}")
+        return
+
+    # Create log directory if file handler is used
+    for handler in config.get("handlers", {}).values():
+        if isinstance(handler, dict) and "filename" in handler:
+            log_file = handler["filename"]
+            os.makedirs(os.path.dirname(log_file), exist_ok=True)
+
+            # Write run separator
+            with open(log_file, "a", encoding="utf-8") as f_out:
+                f_out.write(f"\n{'-'*60}\n")
+                f_out.write(f"START NEW RUN: {dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f_out.write(f"{'-'*60}\n")
+
+    logging.config.dictConfig(config)
+
+
+def setup_logging_json(logging_config_path):
     """Initializes logging from a JSON file."""
     if os.path.exists(logging_config_path):
         with open(logging_config_path, "rt") as f:

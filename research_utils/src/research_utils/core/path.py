@@ -2,9 +2,20 @@ import os
 import logging
 import json
 from pathlib import Path
+import os.path as osp
 
 
 logger = logging.getLogger(__name__)
+
+
+def get_config_path(configs, caller_file):
+    if osp.isabs(configs):
+        return configs
+
+    test_dir = osp.dirname(osp.abspath(caller_file))
+    config_path = osp.join(osp.dirname(test_dir), configs)
+
+    return config_path if osp.exists(config_path) else configs
 
 
 def sys_full_path(env_var, sub_path):

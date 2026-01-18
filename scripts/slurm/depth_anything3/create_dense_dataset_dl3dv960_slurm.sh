@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=create_dense_dataset_for_re10k_DL3DV960_slurm
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/DL3DV960_slurm/%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/DL3DV960_slurm/%j.err.log
+#SBATCH --job-name=create_dense_dataset_for_dl3dv960_slurm
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/dl3dv960_dense/DL3DV960_slurm/%j.out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/dl3dv960_dense/DL3DV960_slurm/%j.err.log
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -11,25 +11,23 @@
 #SBATCH --partition=boost_usr_prod
 #SBATCH --qos=normal
 #SBATCH --account=AIFAC_S02_060
-
-# !! need to check bc i changed things
-
+/leonardo_scratch/large/userexternal/ykeypur0/DL3DV960_slurm $SCRATCH
 # general
-TASK_NAME="create_dense_dataset_for_re10k [DATASET: DL3DV960_slurm] [with Scale Factor and Continous Confidence (outlier_mask.npy)]"
-DESCRIPTION="Run Depth Anything 3 on RE10K dataset [create dense dataset] [50 samples] [for overfitting, to see if the model converges]"
+TASK_NAME="create_dense_dataset_for_dl3dv960 [DATASET: DL3DV960_slurm] [with Scale Factor and Continous Confidence (outlier_mask.npy)]"
+DESCRIPTION="Run Depth Anything 3 on DL3DV960 dataset [create dense dataset] [for overfitting, to see if the model converges]"
 
 # job paths
-DATASET_PATH="${WORK}/data/re10k_precessed/test/test/images"
+DATASET_PATH="${SCRATCH}/DL3DV960_slurm"
 #IMAGES_DIR="${DATASET_PATH}"
 MODEL_DIR="${REPOS}/Depth-Anything-3/models/DA3NESTED-GIANT-LARGE-1.1"
-OUTPUT_DIR="${WORK}/data/re10k_dense_da3_50_samples_with_scale_and_conf"
+OUTPUT_DIR="${WORK}/data/dl3dv960_dense"
 
 # env
 VENV="${ENVS}/depth-anything-env/bin/activate"
 DEPTH_ANYTHING_DIR="${REPOS}/Depth-Anything-3"
 
 # logs
-LOG_DIR="${CODE}/scripts/logs/re10k_dense/50_samples"
+LOG_DIR="${CODE}/scripts/logs/dl3dv960_dense/DL3DV960_slurm"
 
 # Parameters
 # NUM_MAX_POINTS=2000000    # last use: before scale and conf
