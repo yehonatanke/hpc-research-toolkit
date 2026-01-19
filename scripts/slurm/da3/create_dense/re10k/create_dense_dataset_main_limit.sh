@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=create_dense_dataset_for_re10k_50_samples_with_scale_and_conf
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/50_samples/%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/50_samples/%j.err.log
+#SBATCH --job-name=create_dense_dataset_for_re10k_3_samples_with_scale_and_conf
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/3_samples/%j.out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/3_samples/%j.err.log
 #SBATCH --time=01:40:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -13,15 +13,15 @@
 #SBATCH --account=AIFAC_S02_060
 
 # general
-TASK_NAME="create_dense_dataset_for_re10k [50 samples] [with Scale Factor and Continous Confidence (outlier_mask.npy)]"
-DESCRIPTION="Run Depth Anything 3 on RE10K dataset [create dense dataset] [50 samples] [for overfitting, to see if the model converges]"
+TASK_NAME="create_dense_dataset_for_re10k [3 samples] [with Scale Factor and Continous Confidence (outlier_mask.npy)]"
+DESCRIPTION="Run Depth Anything 3 on RE10K dataset [create dense dataset] [3 samples] [for overfitting, to see if the model converges]"
 
 # job paths
 DATASET_PATH="${WORK}/data/re10k_precessed/test/test/images"
 #IMAGES_DIR="${DATASET_PATH}"
 MODEL_DIR="${REPOS}/Depth-Anything-3/models/DA3NESTED-GIANT-LARGE-1.1"
-OUTPUT_DIR="${WORK}/data/re10k_dense_da3_50_samples_with_scale_and_conf"
-
+# OUTPUT_DIR="${WORK}/data/re10k_dense_da3_50_samples_with_scale_and_conf"
+OUTPUT_DIR="${DEBUG}/re10k_dense/3_samples"
 # env
 VENV="${ENVS}/depth-anything-env/bin/activate"
 DEPTH_ANYTHING_DIR="${REPOS}/Depth-Anything-3"
@@ -42,8 +42,10 @@ ALIGN_TO_INPUT_EXT_SCALE=True
 # fixed
 mkdir -p "$OUTPUT_DIR"
 mkdir -p "$LOG_DIR"
-LOG_MSG="[SLURM][INFO]"
-DURATION_MSG="$LOG_MSG[TIME] Duration:"
+LOG_MSG="[INFO]"
+SYS_MSG="[DEBUG:SYS]"
+# GPU_MSG="[DEBUG:GPU]"
+DURATION_MSG="[INFO:TIME] Duration:"
 END_OF_JOB_MSG="${LOG_MSG} --- END OF JOB ---"
 
 # main message
@@ -63,7 +65,7 @@ EOF
 for var in "${GENERAL_VARS[@]}"; do
     printf "%s: %s\n" "$var" "${!var}"
 done
-echo "$PARAM_HEADER\n"
+echo -e "$PARAM_HEADER"
 for var in "${PARAM_VARS[@]}"; do
     printf "%s: %s\n" "$var" "${!var}"
 done
@@ -79,9 +81,9 @@ source "$VENV"
 cd "$DEPTH_ANYTHING_DIR"
 echo -e "${LOG_MSG} Current Directory: $(pwd)"
 
-echo -e "${LOG_MSG} Running DA3 on up to 50 scenes in the dataset..."
 SCENE_COUNT=0
-MAX_SCENES=50
+MAX_SCENES=3
+echo -e "${LOG_MSG} Running DA3 on ${MAX_SCENES} scenes in the dataset..."
 
 for SCENE_DIR in $DATASET_PATH/*/; do
     if [ $SCENE_COUNT -ge $MAX_SCENES ]; then
@@ -109,14 +111,21 @@ for SCENE_DIR in $DATASET_PATH/*/; do
 
     echo -e "$LOG_MSG Scene Name: $SCENE_NAME"
     echo -e "$LOG_MSG RUNNING COMMAND:"
-    printf "da3"
-    printf " %s \\\n    " "${ARGS[@]}"
+    echo "da3 $(print_args ARGS)"
     echo -e "\n"
 
     da3 "${ARGS[@]}"
     
     SCENE_COUNT=$((SCENE_COUNT + 1))
 done
+
+EXIT_CODE=$?
+if [ $EXIT_CODE -eq 0 ]; then
+    echo -e "${SYS_MSG} '$TASK_NAME' completed successfully."
+else
+    echo -e "${SYS_MSG} '$TASK_NAME' failed."
+    exit $EXIT_CODE
+fi
 
 cd "$OUTPUT_DIR"
 cat <<EOF > model_params.yaml

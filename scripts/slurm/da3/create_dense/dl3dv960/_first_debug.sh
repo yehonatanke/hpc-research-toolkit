@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH --job-name=create_dense_dataset_for_dl3dv960_slurm
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/dl3dv960_dense/DL3DV960_slurm/%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/dl3dv960_dense/DL3DV960_slurm/%j.err.log
-#SBATCH --time=04:00:00
+#SBATCH --job-name=create_dense_dataset_for_dl3dv960_debugV1
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/dl3dv960_dense/debug/%j.out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/dl3dv960_dense/debug/%j.err.log
+#SBATCH --time=00:20:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -11,29 +11,35 @@
 #SBATCH --partition=boost_usr_prod
 #SBATCH --qos=normal
 #SBATCH --account=AIFAC_S02_060
-/leonardo_scratch/large/userexternal/ykeypur0/DL3DV960_slurm $SCRATCH
+
+MAX_SCENES=5
+
+
+PRE_MSG="[DEBUG-V1]"
+LIMIT_MSG="[LIMIT: ${MAX_SCENES}]"
 # general
-TASK_NAME="create_dense_dataset_for_dl3dv960 [DATASET: DL3DV960_slurm] [with Scale Factor and Continous Confidence (outlier_mask.npy)]"
-DESCRIPTION="Run Depth Anything 3 on DL3DV960 dataset [create dense dataset] [for overfitting, to see if the model converges]"
+TASK_NAME="${PRE_MSG}${LIMIT_MSG} create_dense_dataset_for_dl3dv960 [DATASET: DL3DV960_slurm/1K] [with Scale Factor and Continous Confidence (outlier_mask.npy)]"
+DESCRIPTION="${PRE_MSG}${LIMIT_MSG} Run Depth Anything 3 on DL3DV960 dataset [create dense dataset] [for overfitting, to see if the model converges]"
 
 # job paths
-DATASET_PATH="${SCRATCH}/DL3DV960_slurm"
-#IMAGES_DIR="${DATASET_PATH}"
+DATASET_PATH="${SCRATCH}/DL3DV960_slurm/1K"
 MODEL_DIR="${REPOS}/Depth-Anything-3/models/DA3NESTED-GIANT-LARGE-1.1"
-OUTPUT_DIR="${WORK}/data/dl3dv960_dense"
+# OUTPUT_DIR="${WORK}/data/dl3dv960_dense"
+OUTPUT_DIR="${DEBUG}/dl3dv960_dense"
 
 # env
 VENV="${ENVS}/depth-anything-env/bin/activate"
 DEPTH_ANYTHING_DIR="${REPOS}/Depth-Anything-3"
 
 # logs
-LOG_DIR="${CODE}/scripts/logs/dl3dv960_dense/DL3DV960_slurm"
+# LOG_DIR="${CODE}/scripts/logs/dl3dv960_dense/DL3DV960_slurm"
+LOG_DIR="${CODE}/scripts/logs/dl3dv960_dense/debug"
 
 # Parameters
 # NUM_MAX_POINTS=2000000    # last use: before scale and conf
 # CONF_THRESH_PERCENTILE=40 # last use: before scale and conf
 
-PROCESS_RES=644
+PROCESS_RES=966 ## TODO: check if this is correct
 PROCESS_RES_METHOD="upper_bound_resize"
 REF_VIEW_STRATEGY="saddle_sim_range"
 EXPORT_FORMAT="dense"
@@ -48,7 +54,7 @@ END_OF_JOB_MSG="${LOG_MSG} --- END OF JOB ---"
 
 # main message
 GENERAL_VARS=(DESCRIPTION DATASET_PATH OUTPUT_DIR MODEL_DIR DEPTH_ANYTHING_DIR LOG_DIR VENV)
-PARAM_VARS=(PROCESS_RES PROCESS_RES_METHOD REF_VIEW_STRATEGY EXPORT_FORMAT ALIGN_TO_INPUT_EXT_SCALE)
+PARAM_VARS=(PROCESS_RES PROCESS_RES_METHOD REF_VIEW_STRATEGY EXPORT_FORMAT ALIGN_TO_INPUT_EXT_SCALE MAX_SCENES)
 GENERAL_HEADER="------------------------ GENERAL -------------------------"
 PARAM_HEADER="------------------------- PARAMETERS -------------------------"
 END_HEADER="----------------------------------------------------------"
@@ -79,21 +85,23 @@ source "$VENV"
 cd "$DEPTH_ANYTHING_DIR"
 echo -e "${LOG_MSG} Current Directory: $(pwd)"
 
-echo -e "${LOG_MSG} Running DA3 on up to 50 scenes in the dataset..."
-# SCENE_COUNT=0
-# MAX_SCENES=50
+echo -e "${LOG_MSG} Running DA3 on up to 50 scenes in the dataset...\n"
+
+# LIMIT 5
+SCENE_COUNT=0
+
 
 for SCENE_DIR in $DATASET_PATH/*/; do
-    # if [ $SCENE_COUNT -ge $MAX_SCENES ]; then
-    #     echo -e "$LOG_MSG Reached limit of $MAX_SCENES scenes. Stopping iteration."
-    #     break
-    # fi
+    if [ $SCENE_COUNT -ge $MAX_SCENES ]; then
+        echo -e "$LOG_MSG Reached limit of $MAX_SCENES scenes. Stopping iteration."
+        break
+    fi
 
     SCENE_NAME=$(basename "$SCENE_DIR")
     mkdir -p "$OUTPUT_DIR/$SCENE_NAME"
     
     ARGS=(
-        auto "$DATASET_PATH/$SCENE_NAME"
+        auto "$DATASET_PATH/$SCENE_NAME/images_4"
         --export-dir "$OUTPUT_DIR/$SCENE_NAME"
         --model-dir "$MODEL_DIR"
         --process-res "$PROCESS_RES"
@@ -109,15 +117,27 @@ for SCENE_DIR in $DATASET_PATH/*/; do
 
     echo -e "$LOG_MSG Scene Name: $SCENE_NAME"
     echo -e "$LOG_MSG RUNNING COMMAND:"
-    printf "da3"
     # printf " %s \\\n    " "${ARGS[@]}"
     echo "da3 $(print_args ARGS)"
     echo -e "\n"
 
     da3 "${ARGS[@]}"
     
-    # SCENE_COUNT=$((SCENE_COUNT + 1))
+    EXIT_CODE=$?
+    if [ $EXIT_CODE -ne 0 ]; then
+        echo -e "$LOG_MSG [ERROR] da3 failed on scene $SCENE_NAME"
+    fi
+
+    SCENE_COUNT=$((SCENE_COUNT + 1))
 done
+
+EXIT_CODE=$?
+if [ $EXIT_CODE -eq 0 ]; then
+    echo -e "$LOG_MSG [SUCCESS] '$TASK_NAME' completed successfully."
+else
+    echo -e "$LOG_MSG [ERROR] '$TASK_NAME' failed."
+    exit $EXIT_CODE
+fi
 
 cd "$OUTPUT_DIR"
 cat <<EOF > model_params.yaml
@@ -129,6 +149,7 @@ REF_VIEW_STRATEGY: "$REF_VIEW_STRATEGY"
 EXPORT_FORMAT: "$EXPORT_FORMAT"
 CONF_THRESH_PERCENTILE: "NONE"
 ALIGN_TO_INPUT_EXT_SCALE: ${ALIGN_TO_INPUT_EXT_SCALE,,}
+MAX_SCENES: $MAX_SCENES
 EOF
 
 if [ $? -eq 0 ]; then

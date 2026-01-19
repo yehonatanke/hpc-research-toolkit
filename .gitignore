@@ -46,3 +46,5 @@ data/*
 logs/*
 *.log
 TODO.txt
+logs/
+logs/*

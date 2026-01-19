@@ -19,7 +19,8 @@ TASK_NAME="create_dense_dataset_for_re10k [DATASET: DL3DV960_slurm] [with Scale 
 DESCRIPTION="Run Depth Anything 3 on RE10K dataset [create dense dataset] [50 samples] [for overfitting, to see if the model converges]"
 
 # job paths
-DATASET_PATH="${WORK}/data/re10k_precessed/test/test/images"
+DATASET_PATH="${WORK}/data/re10k_precessed/train/train/images"
+
 #IMAGES_DIR="${DATASET_PATH}"
 MODEL_DIR="${REPOS}/Depth-Anything-3/models/DA3NESTED-GIANT-LARGE-1.1"
 OUTPUT_DIR="${WORK}/data/re10k_dense_da3_50_samples_with_scale_and_conf"
@@ -113,8 +114,7 @@ for SCENE_DIR in $DATASET_PATH/*/; do
     echo -e "$LOG_MSG RUNNING COMMAND:"
     printf "da3"
     # printf " %s \\\n    " "${ARGS[@]}"
-    echo "da3 $(print_args ARGS)"
-    echo -e "\n"
+    echo -e "\nda3 $(print_args ARGS)"
 
     da3 "${ARGS[@]}"
     
@@ -131,6 +131,7 @@ REF_VIEW_STRATEGY: "$REF_VIEW_STRATEGY"
 EXPORT_FORMAT: "$EXPORT_FORMAT"
 CONF_THRESH_PERCENTILE: "NONE"
 ALIGN_TO_INPUT_EXT_SCALE: ${ALIGN_TO_INPUT_EXT_SCALE,,}
+LOG_DIR: "$LOG_DIR"
 EOF
 
 if [ $? -eq 0 ]; then
