@@ -1,9 +1,9 @@
 #!/bin/bash
 
-#SBATCH --job-name=create_dense_dataset_for_re10k_use_scene_poses_5_samples
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/use_scene_poses/re10k_644_5_samples_new/%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/use_scene_poses/re10k_644_5_samples_new/%j.err.log
-#SBATCH --time=00:30:00
+#SBATCH --job-name=create_dense_dataset_for_re10k_use_scene_poses_ALL
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/use_scene_poses/re10k_644_ALL/%j.out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/re10k_dense/use_scene_poses/re10k_644_ALL/%j.err.log
+#SBATCH --time=04:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -15,8 +15,8 @@
 source ${SLURM_UTILS}/_setup_sbatch.sh
 
 ### PARAMETERS ###
-MAX_SCENES=5
-OUT_NAME="re10k_644_5_samples_new"
+MAX_SCENES=ALL
+OUT_NAME="re10k_644_ALL"
 
 ### DA3 DEBUG FLAGS ###
 export DA3_LOG_LEVEL=DEBUG
@@ -42,10 +42,10 @@ VENV="${ENVS}/depth-anything-env/bin/activate"
 DEPTH_ANYTHING_DIR="${REPOS}/Depth-Anything-3"
 
 ### MESSAGES ###
-PRE_MSG="[USE_SCENE_POSES - CREATE DUMMY DATASET 50 SAMPLES]"
+PRE_MSG="[USE_SCENE_POSES - CREATE DUMMY DATASET - ${MAX_SCENES} SAMPLES]"
 LIMIT_MSG="[LIMIT: ${MAX_SCENES}]"
 ### DESCRIPTION ###
-TASK_NAME="${PRE_MSG}${LIMIT_MSG}[DATASET: RE10K]"
+TASK_NAME="${PRE_MSG}${LIMIT_MSG}[DATASET: RE10K][${MAX_SCENES} SAMPLES]"
 DESCRIPTION="${PRE_MSG}${LIMIT_MSG} Run Depth Anything on RE10K dataset [PROCESS_RES: ${PROCESS_RES}] [CREATE DENSE DATASET] [USE SCENE POSES]"
 
 
@@ -64,10 +64,10 @@ source "$VENV"
 cd "$DEPTH_ANYTHING_DIR"
 SCENE_COUNT=0
 for SCENE_DIR in $DATASET_PATH/*/; do
-    if [ $SCENE_COUNT -ge $MAX_SCENES ]; then
-        echo -e "$LOG_MSG REACHED LIMIT OF $MAX_SCENES SCENES. STOPPING ITERATION."
-        break
-    fi
+    # if [ $SCENE_COUNT -ge $MAX_SCENES ]; then
+    #     echo -e "$LOG_MSG REACHED LIMIT OF $MAX_SCENES SCENES. STOPPING ITERATION."
+    #     break
+    # fi
 
     SCENE_NAME=$(basename "$SCENE_DIR")
     mkdir -p "$OUTPUT_DIR/$SCENE_NAME"

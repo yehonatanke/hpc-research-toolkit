@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=permission_update
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/permission_update/%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/permission_update/%j.err.log
+#SBATCH --job-name=permission_update2
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_workdir/permission_update2_%j.out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_workdir/permission_update2_%j.err.log
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -12,21 +12,22 @@
 #SBATCH --mem=4G
 #SBATCH --account=AIFAC_S02_060
 
-# --- CONFIGURATION ---
-TARGET_DIR="$SCRATCH/DL3DV960_slurm"
-# ---------------------
+### BEFORE RUNNING THIS SCRIPT (or run the after 'all script') ###
+# JOB_IDS=$(squeue -u $USER -h -o %i | tr '\n' ',' | sed 's/,$//')
+# echo $JOB_IDS
+# sbatch --dependency=afterany:$JOB_IDS permission_update.sh
 
-echo "Starting permission update on: $TARGET_DIR"
+### CONFIGURATION ###
+TARGET_DIR="$WORK/data/dl3dv_960"
 
-# Apply 775 to all existing directories and 664 to files
-chmod -R 775 "$TARGET_DIR"
-find "$TARGET_DIR" -type f -exec chmod 664 {} +
+echo "### STARTING PERMISSION UPDATE ON: $TARGET_DIR ###"
 
-# Set the SetGID bit so new files inherit the parent group ID
-find "$TARGET_DIR" -type d -exec chmod g+s {} +
+chmod -R g+rwX "$TARGET_DIR"
 
-# Set Default ACLs so future files/folders inherit rwx for the group
+setfacl -R -m g::rwX "$TARGET_DIR"
+
 setfacl -R -d -m g::rwx "$TARGET_DIR"
 
-echo "Permissions updated successfully."
+echo "### PERMISSIONS UPDATED SUCCESSFULLY ###"
 getfacl "$TARGET_DIR"
+echo "----------------------------------------"

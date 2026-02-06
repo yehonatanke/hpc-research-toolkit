@@ -67,7 +67,8 @@ dry_run_unzip_category_folder() {
 
             # Destination is the category folder (e.g., DL3DV960/1K)
             # Zip content (e.g., SCENE_01/) will be placed inside it.
-            dest="DL3DV960/$subdir"
+            # dest="DL3DV960/$subdir"
+            dest="/leonardo_work/AIFAC_S02_060/data/dl3dv_960/$subdir"
 
             echo "[DRY RUN] unzip -q \"$zip_path\" -d \"$dest\""
 
@@ -79,4 +80,4 @@ dry_run_unzip_category_folder() {
 
 # Example calls (comment/uncomment as desired)
 # dry_run_unzip_scene_folder
-# dry_run_unzip_category_folder
+dry_run_unzip_category_folder
