@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=Unzip_DL3DV960_11K
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_workdir/11K_%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_workdir/11K_%j.err.log
+#SBATCH --job-name=9K
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_work/9K_%j.out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_work/9K_%j.err.log
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -10,11 +10,12 @@
 #SBATCH --partition=lrd_all_serial
 #SBATCH --qos=normal
 #SBATCH --mem=4G
+#SBATCH --gres=tmpfs:100g
 #SBATCH --account=AIFAC_S02_060
 
 
 # operate on the specified subdirectory, e.g. "11K" or "10K"
-DL3DV960_UNZIP_SUBDIR="11K"
+DL3DV960_UNZIP_SUBDIR="9K"
 
 
 _count_types_one_level() {
@@ -71,7 +72,8 @@ unzip_dl3dv960_category_folders() {
         [ -e "$zip_path" ] || continue
 
         # Extracting into the category folder uses the folder structure inside the ZIP
-        unzip -q "$zip_path" -d "$dest_dir"
+        # -o: overwrite existing files
+        unzip -o -q "$zip_path" -d "$dest_dir"
     done
 
     extracted_count_after=$(find "$dest_dir" -mindepth 1 -maxdepth 1 -type d | wc -l)

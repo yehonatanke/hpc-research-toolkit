@@ -1,8 +1,9 @@
 #!/bin/bash
 
-#SBATCH --job-name=permission_update2
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_workdir/permission_update2_%j.out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_workdir/permission_update2_%j.err.log
+#SBATCH --job-name=permission_update_8k_9k
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_work/%x_%j.out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/unzip_dl3dv_960/to_work/%x_%j.err.log
+#SBATCH --account=AIFAC_S02_060
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -10,12 +11,12 @@
 #SBATCH --partition=lrd_all_serial
 #SBATCH --qos=normal
 #SBATCH --mem=4G
-#SBATCH --account=AIFAC_S02_060
+#SBATCH --gres=tmpfs:100g
 
 ### BEFORE RUNNING THIS SCRIPT (or run the after 'all script') ###
 # JOB_IDS=$(squeue -u $USER -h -o %i | tr '\n' ',' | sed 's/,$//')
 # echo $JOB_IDS
-# sbatch --dependency=afterany:$JOB_IDS permission_update.sh
+# sbatch --dependency=afterany:$JOB_IDS $CODE/scripts/slurm/datasets/permission_update.sh
 
 ### CONFIGURATION ###
 TARGET_DIR="$WORK/data/dl3dv_960"
