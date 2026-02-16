@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=2
-#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/dl3dv/download_benchmark/clone/continue/%x_out.log
-#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/dl3dv/download_benchmark/clone/continue/%x_err.log
+#SBATCH --job-name=4
+#SBATCH --output=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/dl3dv/benchmark/clone/continue/%x_out.log
+#SBATCH --error=/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/dl3dv/benchmark/clone/continue/%x_err.log
 #SBATCH --time=04:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
@@ -14,8 +14,8 @@
 #SBATCH --account=AIFAC_S02_060
 
 # --- Configuration ---
-TITLE="DOWNLOADING THE FULL BENCHMARK WITH 960P RESOLUTION"
-# Ensure SCRATCH is defined, or use absolute path
+TITLE="--- [RE]DOWNLOADING THE FULL BENCHMARK WITH RESOLUTION"
+
 TARGET_DIR="${SCRATCH}/DL3DV-10K-BENCHMARK" 
 REPO_URL="huggingface.co/datasets/DL3DV/DL3DV-Benchmark"
 
@@ -85,9 +85,12 @@ else
 fi
 
 # --- Execution ---
-
+export GIT_TRACE=1	
+# GIT_CURL_VERBOSE=1
+EXPORT_LOGS="/leonardo_work/AIFAC_S02_060/data/yk/code/scripts/logs/datasets/dl3dv/benchmark/clone/continue/lfs_progress.log"
+export GIT_LFS_PROGRESS=${EXPORT_LOGS}
 echo ">>> STARTING LFS PULL..."
-git lfs pull
+GIT_TRANSFER_TRACE=1 git lfs pull 
 
 echo "-----------------------------"
 DURATION=$SECONDS

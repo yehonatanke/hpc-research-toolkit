@@ -11,7 +11,7 @@
 #SBATCH --partition=lrd_all_serial
 #SBATCH --qos=normal
 #SBATCH --mem=4G
-#SBATCH --gres=tmpfs:100g
+#SBATCH --gres=tmpfs:30g
 
 ### BEFORE RUNNING THIS SCRIPT (or run the after 'all script') ###
 # JOB_IDS=$(squeue -u $USER -h -o %i | tr '\n' ',' | sed 's/,$//')

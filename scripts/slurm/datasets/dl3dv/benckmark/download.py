@@ -162,10 +162,12 @@ if __name__ == '__main__':
     params = parser.parse_args()
 
 
+    import sys
     if download_benchmark(params):
         print('Download Done. Refer to', params.odir)
     else:
         print(f'Download to {params.odir} Failed. See error messsage.')
+        sys.exit(1)
 
 
 ### I'M USING THIS COMMAND TO DOWNLOAD THE DATASET: ###
